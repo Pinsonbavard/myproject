@@ -238,5 +238,5 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    #app.run(debug=True,port=90)
-    app.run()
+    app.run(debug=True,port=90)
+    #app.run()
