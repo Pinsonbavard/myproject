@@ -21,7 +21,7 @@ from threading import Thread
 from sqlalchemy.orm import relationship, backref
 from time import strftime, gmtime, localtime
 import os
-from path import path
+#from path import path
 from werkzeug import secure_filename
 
 
@@ -195,8 +195,8 @@ def Did():
             try:
 
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                #fileUrl = os.path.abspath(app.config['UPLOAD_FOLDER']+filename)
-                fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
+                fileUrl = os.path.abspath(app.config['UPLOAD_FOLDER']+filename)
+                #fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
 
                 error = 'File uploaded : Path -> ' + fileUrl
                 data_list_dids = System().readCSV(fileUrl)
@@ -238,5 +238,5 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    app.run(debug=True,port=90)
-    #app.run()
+    #app.run(debug=True,port=90)
+    app.run()
