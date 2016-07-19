@@ -36,7 +36,7 @@ from werkzeug import secure_filename
 app = Flask(__name__)
 app.secret_key = "moyinoluwa1999"
 
-app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['UPLOAD_FOLDER'] = 'C:/Users/pinso/Desktop/uploads/'
 CORS(app)
 
 
@@ -182,6 +182,7 @@ def Did():
 
                 flash('DID Successfully created')
                 error = 'DID Successfully created'
+                return render_template('did.html', login_user=login_user, error=error)
 
             elif response == 1:
 
