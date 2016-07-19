@@ -1,0 +1,71 @@
+{% extends "dash.html" %}
+{% block title %}DID - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
+{% block content %}
+	
+	<p></p>
+	<form action="/did" method="post" enctype="multipart/form-data">
+	
+	
+	<div>
+		<label for="auth_gw">Phone number</label>
+		<input type="text" id="auth_gw" name="phone"/>
+	</div>
+	<div>
+		<label for="auth_gw">Provider</label>
+		<select id="auth_gw" name="provider">
+			<option>Select..</option>
+			<option value="Verifone">Verifone</option>
+			<option value="M-PESA">M-PESA</option>
+			<option value="MTN">MTN</option>
+			<option value="AIRTEL">AIRTEL</option>
+			<option value="GLO">GLO</option>
+		</select>
+		
+	</div>
+	<div>
+		<label for="auth_gw">Cost</label>
+		<input type="text" id="auth_gw" name="cost"/>
+	</div>
+	<div>
+		<label for="auth_gw">Country</label>
+		<select id="auth_gw" name="country">
+			<option>Select..</option>
+			<option value="United state">United state</option>
+			<option value="Nigeria">Nigeria</option>
+			<option value="United Kingdom">United Kingdom</option>
+			<option value="Mexico">Mexico</option>
+			<option value="Colombia">Colombia</option>
+			<option value="Ecuador">Ecuador</option>
+			<option value="France">France</option>
+			<option value="Germany">Germany</option>
+		</select>
+	</div>
+	<div>
+		<label for="auth_gw">Capacity</label>
+		<select id="auth_gw" name="capacity">
+			<option>Select..</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+		</select>
+	</div>
+	<p></p>
+	<hr/>
+	<div>
+		<label for="auth_gw">Select CSV file</label>
+		<input type="file" id="auth_gw" name="did_file"/>
+	</div>	
+
+	
+		<button>Create did</button>
+	
+</form>
+
+
+<strong>{% if error != None %} {{error}} {% endif %}</strong>
+
+<strong>{% if did_file != None %} {{did_file}} {% endif %}</strong>
+{% endblock %}
+
+
+

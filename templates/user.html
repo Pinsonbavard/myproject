@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Customer: {{user.first_name}} {{user.last_name}} - Switch{% endblock %}
+{% block content %}
+<h1>Customer: {{user.first_name}} {{user.last_name}}</h1>
+<a href="/customers/{{user.id}}/edit">edit</a>
+<a href="/customers/{{user.id}}/delete">delete</a>
+<br />
+Origin: {{user.number}}<br />
+
+<h2>Destinations</h2>
+<a href="/customers/{{user.id}}/destinations/edit">new</a>
+<table>
+	<thead>
+		<th>DID</th>
+		<th>Destination</th>
+	</thead>
+	<tbody>
+		{% for destination in destinations %}
+			<tr>
+				<td><a href="/customers/{{user.id}}/destinations/{{destination.id}}">{{destination.did}}</a></td>
+				<td>{{destination.number}}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% if dates %}
+	<h2>Calls</h2>
+	{% for date in dates %}
+		<a href="/customers/{{user.id}}/calls/{{date.year}}/{{date.month}}">{{date.month_name}} {{date.year}}</a><br />
+	{% endfor %}
+{% endif %}
+{% endblock %}

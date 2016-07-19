@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Destination: {{destination.did}} - Switch{% endblock %}
+{% block content %}
+<h1>Destination: {{destination.did}}</h1>
+<a href="/customers/{{destination.user_id}}/destinations/{{destination.id}}/edit">edit</a>
+<a href="/customers/{{destination.user_id}}/destinations/{{destination.id}}/delete">delete</a>
+<br />
+Customer: <a href="/customers/{{destination.user_id}}">{{destination.first_name}} {{destination.last_name}}</a><br />
+DID: {{destination.did}}<br />
+Destinaton: {{destination.number}}
+{% endblock %}
