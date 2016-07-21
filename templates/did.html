@@ -31,14 +31,9 @@
 		<label for="auth_gw">Country</label>
 		<select id="auth_gw" name="country">
 			<option>Select..</option>
-			<option value="United state">United state</option>
-			<option value="Nigeria">Nigeria</option>
-			<option value="United Kingdom">United Kingdom</option>
-			<option value="Mexico">Mexico</option>
-			<option value="Colombia">Colombia</option>
-			<option value="Ecuador">Ecuador</option>
-			<option value="France">France</option>
-			<option value="Germany">Germany</option>
+			{% for country in countries %}
+				<option value="{{country.country}}">{{country.country}}</option>
+			{% endfor %}
 		</select>
 	</div>
 	<div>

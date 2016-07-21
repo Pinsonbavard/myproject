@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <title>Untitled Document</title>
+      
+      <style type="text/css">
+      
+      body{
+        padding:0;
+        margin:0;
+        clear:both;
+        content:"";
+      }
+      a{
+        color:#0080C0;
+        text-decoration:none;
+      }
+      a:hover{
+        text-decoration:underline;
+      }
+      img{
+        border:0;
+      }
+      li,ol,ul{
+        list-style:none;
+        margin:0;
+        padding:0;
+      }
+      .body_container{
+        width:100%; height:100%; height:auto !important;
+        display:block;
+        overflow:hidden;
+        position:relative;
+        color: #222F3E;
+        font-size: 14px;
+        line-height: 30px;
+        font-family: Helvetica, sans-serif;
+        font-weight: normal;
+        text-align: left;
+        background:#F5F5F5;
+      }
+      .main_container{
+        display:block; overflow: hidden;
+        margin:40px auto;
+        width:600px;
+        background:#fff;
+        position:relative;
+      }
+      .header,.footer{
+        display:block; overflow:hidden;
+        margin:0;
+        padding:0;
+        height:150px;
+        border-bottom:solid 1px #CDD4D8;
+        position:relative;
+      }
+      .header{
+        
+        background:#fff;
+      }
+      .footer{
+        height: auto;
+        display:block; overflow:hidden;
+        background:#B7FFDB;
+        border-top:solid 1px #fff;
+        font-size:11px;
+      }
+      .footer .unsub{
+        margin:10px;
+        text-align:center;
+        display:block;
+      }
+      
+      #logo{
+        padding:40px;
+      }
+      #logo img{width:120px; height:70px; }
+      #dater{
+        color:#575757;
+        font-size:12px;
+      }
+      .inner_content{
+        font:inherit;
+        margin:20px;
+        display:block;
+        overflow:hidden;
+        min-height:200px;
+      }
+      a.linker{
+        display: inline-block;
+        padding:5px;
+        margin:10px auto;
+        text-decoration:none;
+        color:#fff;
+        text-shadow:0px 0px 4px #900;
+        normal normal 700 13px/16px Tahoma;
+        font-family: Tahoma;
+        font-size: 13px;
+        font-size-adjust: none;
+        font-stretch: normal;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: 700;
+        border:solid 1px #900;
+        background: transparent repeat scroll 0% 0% / auto padding-box border-box;
+        background-attachment: scroll;
+        background-clip: border-box;
+        background-color: transparent;
+        background-origin: padding-box;
+        background-size: auto;
+        background-color:#930;
+        border-radius:3px;
+      }
+      a.linker:hover{
+        text-decoration:none;
+      }
+      .margin10{
+        margin:10px;
+        width:100%;
+        overflow:auto;
+      }
+      .margin5{
+        margin:5px;
+        width:100%;
+        overflow:auto;
+      }
+      table#mytable,table#mytable1,#mytable2,#mytable3{
+      border-collapse:collapse;
+      overflow:hidden;
+      color:#2D2D2D;
+      }
+      #mytable td, #mytable th,#mytable1 td, #mytable1 th, #mytable2 th,#mytable2 td, #mytable3 th,#mytable3 td
+      {
+      border:0;
+      padding:5px 7px 4px 7px;
+      vertical-align:top;
+      }
+      #mytable th,#mytable1 th,#mytable2 th,#mytable3 th
+      {
+      text-align:left;
+      padding-top:5px;
+      padding-bottom:4px;
+      color:#000;
+      font-weight:normal;
+      }
+      
+      </style>
+      
+      </head>
+      
+      <body>
+      <div class="body_container">
+      <div class="main_container" style="
+        color: #222F3E;
+        font-size: 14px;
+        line-height: 22px;
+        font-family: Helvetica, sans-serif;
+        font-weight: normal;
+        text-align: left;">
+        <div class="header">          
+          <table width="700" border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="20" height="78"></td>
+            <td width="" align="center" valign="middle"><a href="#"><img src="http://crestovista.com/guest/sinlimites.png" height="75" id="logo"></td>
+            <td width="170" align="right" valign="bottom"><table width="100%" border="0" align="right" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><span id="dater" style="color:#fff;">Just now</span></td>
+            </tr>
+            </table></td>
+          </tr>
+          </table>
+        </div>
+        <div class="inner_content">
+          <h3>Hi {{firstname}},</h3>
+          <p>We are please to welcome you to SinLimites. SinLimites is an organization that handles all DID calls across the United State and the rest of the world</p>
+          <h4>Find below your meeting details</h4>
+          <div>Email : <strong>{{email}}</strong></div>
+          {% if account  %}<div>Account : <strong>{{account}}</strong></div>{% endif %}
+        </div>
+        <p style="padding: 30px;">The above detail should be use for login. Thanks</p>
+        <span class="divider_gray"></span>
+        <div class="footer">
+          <span class="unsub">All Rights Reserved at SinLimites Inc</span>
+        </div>
+      </div>
+      </div>
+      
+      </body>
+      </html>

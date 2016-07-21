@@ -26,7 +26,7 @@
 	{% for pin in pins%}
 	<tr>
 		<td>{{pin.id}}</td>
-		<td>{{pin.pin}}</td>
+		<td><strong>{{pin.pin}}</strong></td>
 		<td>{{pin.created_by | User }}</td>
 		<td>{{pin.created_date | humandatetime | safe}}</td>
 		<td>{{pin.mode}}</td>

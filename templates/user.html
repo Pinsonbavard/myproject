@@ -1,5 +1,6 @@
-{% extends "base.html" %}
-{% block title %}Customer: {{user.first_name}} {{user.last_name}} - Switch{% endblock %}
+{% extends "dash.html" %}
+{% block title %}OWN - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
 {% block content %}
 <h1>Customer: {{user.first_name}} {{user.last_name}}</h1>
 <a href="/customers/{{user.id}}/edit">edit</a>

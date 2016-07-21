@@ -1,8 +1,9 @@
-{% extends "base.html" %}
+{% extends "dash.html" %}
 {% block title %}Customers - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
 {% block content %}
 <h1>Customers</h1>
-<a href="/customers/edit">new</a>
+<a href="/customers/create">new</a>
 <table>
 	<thead>
 		<tr>

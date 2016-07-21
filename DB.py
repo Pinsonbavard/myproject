@@ -38,18 +38,21 @@ class Users(db.Model):
     account  = db.Column(db.Unicode(10), nullable=False)
     number  = db.Column(db.String(30), nullable=False)
     user_type  = db.Column(db.String(10), nullable=False, default='ADMIN')
+    created_by  = db.Column(db.Unicode(10), nullable=False, default='SYSTEM')
     destinations = db.relationship('Destinations',backref="user",lazy="dynamic")
     calls = db.relationship('Calls',backref="user",lazy="dynamic")
     pin = db.relationship('Pin',backref="user",lazy="dynamic")
     did = db.relationship('Did',backref="user",lazy="dynamic")
 
-    def __init__(self,firstname,lastname,email,account,number):
+    def __init__(self,firstname,lastname,email,account,number,user_id=None,user_type=None):
 
         self.first_name = firstname
         self.last_name = lastname
         self.email = email
         self.account = account
         self.number = number
+        self.created_by = user_id
+        self.user_type = user_type
     
 
 class Destinations(db.Model):
@@ -142,6 +145,22 @@ class Own(db.Model):
         self.did = did
         self.created_by = user_id
 
+class Country(db.Model):
+
+    __tablename__ = 'countries'
+    import datetime
+    id = db.Column(db.Integer, primary_key = True)
+    country = db.Column(db.Unicode(30), nullable=False)
+    region = db.Column(db.Unicode(30), nullable=False)
+    created_by = db.Column(db.Unicode(30), db.ForeignKey('users.id'))
+    created_date = db.Column(db.DateTime, default=datetime.datetime.now())
+
+    def __init__(self,region,country,user_id):
+
+        self.region = region
+        self.country = country
+        self.created_by = user_id
+
 
 class System():
     
@@ -169,6 +188,11 @@ class System():
 
         pins = Pin.query.all()
         return pins
+
+    def countries(self):
+
+        countries = Country.query.all()
+        return countries
 
     def disk_usage(self):
         
@@ -263,6 +287,11 @@ class User(Users):
         exist = db.session.query(Users).filter_by(email=self.email).first()
         return exist
 
+    def findCountry(self,country):
+        exist = db.session.query(exists().where(Country.country == country)).scalar()
+        return exist
+
+
     def checkDid(self, phone):
 
         exist = db.session.query(exists().where(Did.phone == phone)).scalar()
@@ -272,6 +301,22 @@ class User(Users):
 
         exist = db.session.query(exists().where(Own.sim == sim)).scalar()
         return exist
+
+    def createCustomer(self,firstname,lastname,email,number,user_type='USER',account=None):
+
+        if not System().getUser(email):
+
+            ### INSERT INTO USER with customer
+            user = self.find()
+            user_id = user.id
+            customer = Users(firstname,lastname,email,account,number,user_id,user_type)
+            db.session.add(customer)
+            db.session.commit()
+            return 0
+
+        return 1
+
+        
 
     def createSim(self,sim,did):
 
@@ -284,6 +329,24 @@ class User(Users):
             try:
 
                 db.session.add(own)
+                db.session.commit()
+                return 0
+            except:
+                return 506
+        return 1
+
+
+    def createCountry(self,region,country):
+
+        if not self.findCountry(country):
+
+            ### INSERT INTO THE own table
+            user = self.find()
+            user_id = user.id
+            country = Country(region,country,user_id)
+            try:
+
+                db.session.add(country)
                 db.session.commit()
                 return 0
             except:

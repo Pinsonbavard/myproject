@@ -36,10 +36,26 @@ e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql81
 app = Flask(__name__)
 app.secret_key = "moyinoluwa1999"
 
+def ensure_dir(d):
+
+    if not os.path.exists(d):
+
+        os.makedirs(d)
+
+
 app.config['UPLOAD_FOLDER'] = 'C:/Users/pinso/Desktop/uploads/'
+app.config["MAIL_SERVER"] = "smtp.pepipost.com"
+app.config["MAIL_PORT"] = 25
+#app.config["MAIL_USE_TLS"] = True
+#app.config["MAIL_USE_SSL"] = True
+app.config["MAIL_USERNAME"] = "guest"
+app.config["MAIL_PASSWORD"] = "FunmiFatimo"
+app.config["DEFAULT_MAIL_SUBJECT"] = "SinLimites"
+app.config["DEFAULT_MAIL_SENDER"] = "SinLimites<no-reply@sci.ng>"
 ##app.config['UPLOAD_FOLDER'] = 'http://crestovista.com/guest-admin/www/img/'
 CORS(app)
 
+mail = Mail(app)
 
 manager = APIManager(app,flask_sqlalchemy_db=db)
 
@@ -108,6 +124,10 @@ def Register():
                 else:
 
                     session['username'] = email
+                    msg = Message("Registration successfull, your registration details ",sender=app.config["DEFAULT_MAIL_SENDER"],recipients=[email])
+                    msg.html = render_template("reg-email.html",firstname=firstname,lastname=lastname,account=account,email=email)
+                    thr = Thread(target=send_async_email_test, args=[app, msg])
+                    thr.start()
                     flash("Logged In")
                     login_user = system.getUser(session.get('username'))
                     return redirect(url_for('Home', login_user=login_user))
@@ -144,7 +164,60 @@ def Login():
     login_user = system.getUser(session.get('username'))
     return render_template('home.html', login_user=login_user)
 
+@app.route('/customers')
+def users():
 
+    if session.get('username'):
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        return render_template('users.html', login_user=login_user)
+    return redirect(url_for("Index"))
+
+@app.route('/customers/create', methods=['POST','GET'])
+def user_create():
+
+    
+    if session.get('username'):
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        error = None
+
+        if request.method == 'POST':
+
+            firstname = request.form['firstname']
+            lastname = request.form['lastname']
+            email_cust = request.form['email_cust']
+            origin = request.form['number']
+
+            if len(firstname) < 1:
+                abort(400, 'Enter firstname')
+            elif len(lastname) < 1:
+                abort(400, 'Enter lastname')
+            elif len(origin) < 1:
+                abort(400, 'Enter phone number')
+            elif len(email_cust) < 1:
+                abort(400, 'Enter email address')
+            email = session.get('username')
+            response = User(email).createCustomer(firstname,lastname,email_cust,origin)
+            if response == 0:
+
+                error = firstname + ' ' + lastname + ' is added Successfully'
+                flash("Customer added Successfully")
+                msg = Message("Registration successfull, your registration details ",sender=app.config["DEFAULT_MAIL_SENDER"],recipients=[email_cust])
+                msg.html = render_template("reg-email.html",firstname=firstname,lastname=lastname,email=email)
+                thr = Thread(target=send_async_email_test, args=[app, msg])
+                thr.start()
+                return render_template('user-create.html', login_user=login_user, error=error)
+
+            if response == 1:
+
+                error = email_cust + ' already exist, so no record created'
+                return render_template('user-create.html', login_user=login_user, error=error)
+
+        return render_template('user-create.html', login_user=login_user)
+    return redirect('/')
+
+    
 
 @app.route("/home")
 def Home():
@@ -188,6 +261,40 @@ def Pin():
 
     return redirect(url_for("Index"))
 
+
+@app.route("/countries", methods=['POST','GET'])
+def countries():
+    if session.get('username'):
+
+        system = System()
+        countries = system.countries()
+        login_user = system.getUser(session.get('username'))
+        error = None
+        if request.method == 'POST':
+
+            country = request.form['country']
+            region = request.form['region']
+
+            if len(country) < 1:
+                abort(400, 'No country entered')
+            elif len(region) < 1:
+                abort(400, 'No region selected')
+
+            email = session.get('username')
+            response = User(email).createCountry(region,country)
+            if response == 0:
+                error = country + ' added to region ' + region+', refresh browser to see update'
+                flash("Country added Successfully")
+                return render_template('country.html', login_user=login_user, error=error,countries=countries)
+            if response == 506:
+
+                abort(400,'No data insertion was made, please check Internet connectivity')
+            if response == 1:
+                error = country + ' already exist'
+                return render_template('country.html', login_user=login_user, error=error,countries=countries)
+        return render_template('country.html', login_user=login_user, error=error,countries=countries)
+
+    return redirect(url_for("Index"))
 
 @app.route("/own", methods=['POST','GET']) 
 def Own():
@@ -274,6 +381,7 @@ def Did():
         system = System()
         login_user = system.getUser(session.get('username'))
         pins = system.pins()
+        countries = system.countries()
         dids = system.dids()
         error = None
 
@@ -315,7 +423,7 @@ def Did():
 
                     flash('DID Successfully created')
                     error = 'DID Successfully created with pin '+pin
-                    return render_template('did.html', login_user=login_user, error=error, dids=dids)
+                    return render_template('did.html', login_user=login_user, error=error, dids=dids, countries=countries)
 
                 elif response == 1:
 
@@ -350,9 +458,9 @@ def Did():
 
                 error = 'File format is not allowed'
 
-            return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids)
+            return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids,countries=countries)
 
-        return render_template('did.html', login_user=login_user, error=error, pins=pins, dids=dids)
+        return render_template('did.html', login_user=login_user, error=error, pins=pins, dids=dids,countries=countries)
 
     return redirect(url_for("Index"))
 
@@ -373,7 +481,12 @@ def Logout():
 
 
 
+def send_async_email_test(app,msg):
+    
+    with app.app_context():
 
+        mail.send(msg)
+        
     
         
     
@@ -384,5 +497,5 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    #app.run(debug=True,port=90)
+    ##app.run(debug=True,port=90)
     app.run()

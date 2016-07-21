@@ -1,45 +1,29 @@
-{% extends "base.html" %}
-{% block title %}Edit customer - Switch{% endblock %}
+{% extends "dash.html" %}
+{% block title %}Customers - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
 {% block content %}
 <h1>Edit customer</h1>
 <form action="/save-customer" method="post">
 	<div>
 		<label for="first_name">First Name</label>
-		<input id="first_name" name="first_name" value="{{user.first_name}}" />
-		{% if 'missing-first-name' in user.errors %}
-			<span class="error">Missing first name</span>
-		{% endif %}
+		<input id="first_name" name="first_name" value="{{login_user.first_name}}" />
+		
 	</div>
 	<div>
 		<label for="last_name">Last Name</label>
-		<input id="last_name" name="last_name" value="{{user.last_name}}" />
-		{% if 'missing-last-name' in user.errors %}
-			<span class="error">Missing last name</span>
-		{% endif %}
+		<input id="last_name" name="last_name" value="{{login_user.last_name}}" />
+		
 	</div>
 	<div>
 		<label for="number">Origin</label>
-		<input id="number" name="number" value="{{user.number}}" />
-		{% if 'missing-number' in user.errors %}
-			<span class="error">Missing number</span>
-		{% endif %}
+		<input id="number" name="number" value="{{login_user.number}}" />
+		
 	</div>
 	<div>
-		{% if user.id %}
-			<input type="hidden" name="id" value="{{user.id}}" />
+		{% if login_user.id %}
+			<input type="hidden" name="id" value="{{login_user.id}}" />
 		{% endif %}
 		<button>Save</button>
 	</div>
 </form>
-<script type="text/javascript">
-	{% if 'missing-first-name' in user.errors %}
-		document.forms[0].first_name.focus();
-	{% elif 'missing-last-name' in user.errors %}
-		document.forms[0].last_name.focus();
-	{% elif 'missing-number' in user.errors %}
-		document.forms[0].number.focus();
-	{% else %}
-		document.forms[0].first_name.focus();
-	{% endif %}
-</script>
 {% endblock %}
