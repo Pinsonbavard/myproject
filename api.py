@@ -29,7 +29,7 @@ from werkzeug import secure_filename
 
     
 
-#e = create_engine("mysql://sql5108481:r5EncJbtBG@sql5.freemysqlhosting.net/sql5108481", pool_recycle=299)
+e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=299)
 
 #e = create_engine("mysql://firsvat:Firsvat@2016@98.102.204.204:3306/firsvat", pool_recycle=3600)
 
@@ -37,6 +37,7 @@ app = Flask(__name__)
 app.secret_key = "moyinoluwa1999"
 
 app.config['UPLOAD_FOLDER'] = 'C:/Users/pinso/Desktop/uploads/'
+##app.config['UPLOAD_FOLDER'] = 'http://crestovista.com/guest-admin/www/img/'
 CORS(app)
 
 
@@ -49,9 +50,19 @@ manager.create_api(Calls)
 
 manager.create_api(Destinations)
 
+@app.template_filter('User')
+def _jinja2_filter_user(id):
 
+    system = System()
+    user = system.getUserById(id)
+    if user is None:
+        return "SYSTEM"
+    return user.first_name + ' '+ user.last_name
 
-
+@app.template_filter('humandatetime')
+def _jinja2_filter_humandatetime(date):
+    date = date.replace(tzinfo=None)
+    return date.strftime('%a&nbsp;%d&nbsp;%b&nbsp;%Y&nbsp;%H:%M')
 
 @app.route("/")
 def Index():
@@ -138,83 +149,216 @@ def Login():
 @app.route("/home")
 def Home():
 
-    system = System()
-    login_user = system.getUser(session.get('username'))
-    return render_template('home.html', login_user=login_user)
+    if session.get('username'):
+
+
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        return render_template('home.html', login_user=login_user)
+    return redirect(url_for("Index"))
+
+
+@app.route("/pin", methods=['POST','GET']) 
+def Pin():
+
+
+    if session.get('username'):
+
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        error = None
+
+        if request.method == "POST":
+
+            
+            email = session.get('username')
+            response = User(email).createPins()
+
+            if type(response) is int:
+
+                error = 'Error ' + str(response)
+                return render_template('pin.html', login_user=login_user, error=error)
+            else:
+
+                error = response
+                return render_template('pin.html', login_user=login_user, error=error)
+        return render_template('pin.html', login_user=login_user, error=error)
+
+
+    return redirect(url_for("Index"))
+
+
+@app.route("/own", methods=['POST','GET']) 
+def Own():
+
+
+    if session.get('username'):
+
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        dids = system.dids()
+        owns = system.owns()
+        error = None
+
+        if request.method == 'POST':
+
+            file = request.files['own_file']
+
+            if not file:
+
+                sim = request.form['sim']
+                did = request.form['did']
+
+                if len(sim) < 1:
+                    abort(400, 'Please enter a SIM number')
+                elif len(did) < 1:
+                    abort(400,'Please select a did')
+
+                email = session.get('username')
+                response = User(email).createSim(sim,did)
+                if response == 0:
+                    flash('OWN Successfully created')
+                    error = 'OWN Successfully created with did '+did
+                    return render_template('own.html', login_user=login_user, error=error,owns=owns)
+
+                elif response == 1:
+                    abort(400, 'OWN %s already exist with SIM '%(sim))
+
+                elif response == 506:
+                    abort(400, 'Error:'+response+', Data insertion error')
+
+            if System().allowed_file(file.filename):
+
+
+                filename = secure_filename(file.filename)
+
+                try:
+
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    fileUrl = os.path.abspath(app.config['UPLOAD_FOLDER']+filename)
+                    #fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
+
+                    error = 'File uploaded : Path -> ' + fileUrl
+                    data_list_owns = System().readCSV(fileUrl)
+                    insert_owns = System().insertOwns(data_list_owns)
+
+                    error =  str(insert_owns) + ' OWN has been uploaded and saved'
+
+                except:
+
+
+                    error = 'File not uploaded Successfully'
+        
+            else:
+
+                error = 'File format is not allowed'
+
+            return render_template('own.html', login_user=login_user, error=error, own_file=file, owns=owns)
+
+
+        return render_template('own.html', login_user=login_user, error=error, dids=dids, owns=owns)
+
+
+    return redirect(url_for("Index"))
+
 
 @app.route("/did", methods=['POST','GET']) 
 def Did():
 
 
-    system = System()
-    login_user = system.getUser(session.get('username'))
-    error = None
+    if session.get('username'):
 
-    if request.method == 'POST':
 
-        file = request.files['did_file']
 
-        if not file:
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        pins = system.pins()
+        dids = system.dids()
+        error = None
 
-            phone = request.form['phone']
-            cost = request.form['cost']
-            country = request.form['country']
-            capacity = request.form['capacity']
-            provider = request.form['provider']
+        if request.method == 'POST':
+
+            file = request.files['did_file']
+
+            if not file:
+
+                phone = request.form['phone']
+                cost = request.form['cost']
+                country = request.form['country']
+                capacity = request.form['capacity']
+                provider = request.form['provider']
+                mode = request.form['mode']
+                pin = request.form['pin']
         
-            if len(phone) < 1:
+                if len(phone) < 1:
 
-                abort(400, 'The phone number is invalid')
-            elif len(cost) < 1:
-                abort(400,'Invalid cost specified')
-            elif len(country) < 1:
-                abort(400, 'Invalid country code')
-            elif len(capacity) < 1:
-                abort(400, 'Please select capacity')
-            elif len(provider) < 1:
-                abort(400, 'Please select provider')
+                    abort(400, 'The phone number is invalid')
+                elif len(cost) < 1:
+                    abort(400,'Invalid cost specified')
+                elif len(country) < 1:
+                    abort(400, 'Invalid country code')
+                elif len(capacity) < 1:
+                    abort(400, 'Please select capacity')
+                elif len(provider) < 1:
+                    abort(400, 'Please select provider')
+                elif len(mode) < 1:
+                    abort(400, 'Please select mode')
+                elif len(pin) < 1:
+                    abort(400, 'Please select pin')
 
-            email = session.get('username')
-            response = User(email).createDid(phone,provider,cost,country,capacity)
+                email = session.get('username')
+                response = User(email).createDid(phone,provider,cost,country,capacity,mode,pin)
 
-            if response == 0:
+                if response == 0:
 
 
-                flash('DID Successfully created')
-                error = 'DID Successfully created'
-                return render_template('did.html', login_user=login_user, error=error)
+                    flash('DID Successfully created')
+                    error = 'DID Successfully created with pin '+pin
+                    return render_template('did.html', login_user=login_user, error=error, dids=dids)
 
-            elif response == 1:
+                elif response == 1:
 
-                abort(400, 'DID %s already exist'%(phone))
+
+                    abort(400, 'DID %s already exist'%(phone))
+                else:
+                    abort(400, 'DID is not created')
+        
+            if System().allowed_file(file.filename):
+
+
+                filename = secure_filename(file.filename)
+
+                try:
+
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    fileUrl = os.path.abspath(app.config['UPLOAD_FOLDER']+filename)
+                    #fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
+
+                    error = 'File uploaded : Path -> ' + fileUrl
+                    data_list_dids = System().readCSV(fileUrl)
+                    insert_dids = System().insertDids(data_list_dids)
+
+                    error =  str(insert_dids) + ' DIDs has been uploaded and saved'
+
+                except:
+
+
+                    error = 'File not uploaded Successfully'
+        
             else:
-                abort(400, 'DID is not created')
-        
-        if System().allowed_file(file.filename):
 
-            filename = secure_filename(file.filename)
-            try:
+                error = 'File format is not allowed'
 
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                fileUrl = os.path.abspath(app.config['UPLOAD_FOLDER']+filename)
-                #fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
+            return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids)
 
-                error = 'File uploaded : Path -> ' + fileUrl
-                data_list_dids = System().readCSV(fileUrl)
-                insert_dids = System().insertDids(data_list_dids)
+        return render_template('did.html', login_user=login_user, error=error, pins=pins, dids=dids)
 
-                error =  str(insert_dids) + ' DIDs has been uploaded and saved'
+    return redirect(url_for("Index"))
 
-            except:
 
-                error = 'File not uploaded Successfully'
-            
-        else:
 
-            error = 'File format is not allowed'
-        return render_template('did.html', login_user=login_user, error=error, did_file=file)
 
-    return render_template('did.html', login_user=login_user, error=error)
+    
 
 
 

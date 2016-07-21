@@ -1,0 +1,64 @@
+{% extends "dash.html" %}
+{% block title %}OWN - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
+{% block content %}
+	
+	<p></p>
+	<form action="/own" method="post" enctype="multipart/form-data">
+	
+	
+	<div>
+		<label for="auth_gw">SIM number</label>
+		<input type="text" id="auth_gw" name="sim"/>
+	</div>
+	<div>
+		<label for="auth_gw">DID number</label>
+		<select id="auth_gw" name="did">
+			<option>Select..</option>
+			{% for did in dids %}
+				<option value="{{did.phone}}">{{did.phone}}[{{did.pin}}]</option>
+			{% endfor %}
+		</select>
+		
+	</div>
+	
+	<p></p>
+	<hr/>
+	<div>
+		<label for="auth_gw">Select CSV file</label>
+		<input type="file" id="auth_gw" name="own_file"/>
+	</div>	
+
+	
+		<button>Create own</button>
+	
+</form>
+
+
+<strong>{% if error != None %} {{error}} {% endif %}</strong>
+
+<strong>{% if own_file != None %} {{own_file}} {% endif %}</strong>
+
+<p></p>
+<hr/>
+<table>
+	<tr>
+		<th>SIM</th>
+		<th>DID</th>
+		<th>Created by</th>
+		<th>Created date</th>
+	</tr>
+	{% for own in owns%}
+	<tr>
+		<td>{{own.sim}}</td>
+		<td>{{own.did}}</td>
+		<td>{{own.created_by | User }}</td>
+		<td>{{own.created_date | humandatetime | safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}
+
+
+

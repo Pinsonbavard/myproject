@@ -49,8 +49,27 @@
 			<option value="3">3</option>
 		</select>
 	</div>
+	<div>
+		<label for="auth_gw">mode</label>
+		<select id="auth_gw" name="mode">
+			<option>Select..</option>
+			<option value="PIN-DIALING">PIN-DIALING</option>
+			<option value="DIRECT-DIALING">DIRECT-DIALING</option>
+		</select>
+	</div>
+	<div>
+		<label for="auth_gw">Pins</label>
+		<select id="auth_gw" name="pin">
+			<option>Select..</option>
+			{% for pin in pins %}
+				<option value="{{pin.pin}}">{{pin.pin}}</option>
+			{% endfor %}
+		</select>
+		
+	</div>
 	<p></p>
 	<hr/>
+	<p></p>
 	<div>
 		<label for="auth_gw">Select CSV file</label>
 		<input type="file" id="auth_gw" name="did_file"/>
@@ -65,6 +84,32 @@
 <strong>{% if error != None %} {{error}} {% endif %}</strong>
 
 <strong>{% if did_file != None %} {{did_file}} {% endif %}</strong>
+<p></p>
+<hr/>
+<table>
+	<tr>
+		<th>Phone number</th>
+		<th>Provider</th>
+		<th>Cost</th>
+		<th>Capacity</th>
+		<th>Mode</th>
+		<th>Pin</th>
+		<th>Created by</th>
+		<th>Created date</th>
+	</tr>
+	{% for did in dids%}
+	<tr>
+		<td>{{did.phone}}</td>
+		<td>{{did.provider}}</td>
+		<td>{{did.cost}}</td>
+		<td>{{did.capacity}}</td>
+		<td>{{did.mode}}</td>
+		<td>{{did.pin}}</td>
+		<td>{{did.created_by | User }}</td>
+		<td>{{did.created_date | humandatetime | safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
 {% endblock %}
 
 
