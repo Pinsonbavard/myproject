@@ -204,7 +204,7 @@ def user_create():
                 error = firstname + ' ' + lastname + ' is added Successfully'
                 flash("Customer added Successfully")
                 msg = Message("Registration successfull, your registration details ",sender=app.config["DEFAULT_MAIL_SENDER"],recipients=[email_cust])
-                msg.html = render_template("reg-email.html",firstname=firstname,lastname=lastname,email=email)
+                msg.html = render_template("reg-email.html",firstname=firstname,lastname=lastname,email=email_cust)
                 thr = Thread(target=send_async_email_test, args=[app, msg])
                 thr.start()
                 return render_template('user-create.html', login_user=login_user, error=error)
@@ -497,5 +497,5 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    ##app.run(debug=True,port=90)
+    #app.run(debug=True,port=90)
     app.run()
