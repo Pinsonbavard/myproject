@@ -165,6 +165,7 @@ def Pin():
     if session.get('username'):
 
         system = System()
+        pins = system.pins()
         login_user = system.getUser(session.get('username'))
         error = None
 
@@ -177,12 +178,12 @@ def Pin():
             if type(response) is int:
 
                 error = 'Error ' + str(response)
-                return render_template('pin.html', login_user=login_user, error=error)
+                return render_template('pin.html', login_user=login_user, error=error, pins=pins)
             else:
 
                 error = response
-                return render_template('pin.html', login_user=login_user, error=error)
-        return render_template('pin.html', login_user=login_user, error=error)
+                return render_template('pin.html', login_user=login_user, error=error, pins=pins)
+        return render_template('pin.html', login_user=login_user, error=error, pins=pins)
 
 
     return redirect(url_for("Index"))

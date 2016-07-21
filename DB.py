@@ -118,6 +118,7 @@ class Pin(db.Model):
     pin = db.Column(db.Unicode(30), nullable=False)
     created_by = db.Column(db.Unicode(30), db.ForeignKey('users.id'))
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
+    mode = db.Column(db.Unicode(20), nullable=False)
 
     def __init__(self,pin,user_id):
 

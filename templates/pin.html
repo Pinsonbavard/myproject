@@ -13,8 +13,29 @@
 
 <strong>{% if error != None %} {{error}} {% endif %}</strong>
 
+<p></p>
+<hr/>
+<table class="table">
+	<tr>
+		<th>ID</th>
+		<th>Pin</th>
+		<th>Created by</th>
+		<th>Created date</th>
+		<th>Mode</th>
+	</tr>
+	{% for pin in pins%}
+	<tr>
+		<td>{{pin.id}}</td>
+		<td>{{pin.pin}}</td>
+		<td>{{pin.created_by | User }}</td>
+		<td>{{pin.created_date | humandatetime | safe}}</td>
+		<td>{{pin.mode}}</td>
+	</tr>
+	{% endfor %}
+</table>
 
 {% endblock %}
+
 
 
 
