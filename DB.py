@@ -184,6 +184,11 @@ class System():
         owns = Own.query.all()
         return owns
 
+    def customers(self):
+
+        customers = Users.query.filter_by(user_type='USER').all()
+        return customers
+
     def pins(self):
 
         pins = Pin.query.all()

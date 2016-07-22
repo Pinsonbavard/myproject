@@ -170,7 +170,8 @@ def users():
     if session.get('username'):
         system = System()
         login_user = system.getUser(session.get('username'))
-        return render_template('users.html', login_user=login_user)
+        customers = system.customers()
+        return render_template('users.html', login_user=login_user, customers=customers)
     return redirect(url_for("Index"))
 
 @app.route('/customers/create', methods=['POST','GET'])
@@ -217,7 +218,20 @@ def user_create():
         return render_template('user-create.html', login_user=login_user)
     return redirect('/')
 
-    
+
+@app.route('/customers/<int:user_id>/edit')
+@app.route('/customers/edit')
+def user_edit(user_id=None):
+    user = session.get('saved-user', {})
+    if not user and user_id:
+        cur = g.db.cursor()
+        cur.execute('select * from users where id=%s', (user_id,))
+        user = cur.fetchone()
+        if not user:
+            return redirect('/customers')
+#   else:
+#       user = session.pop('saved-user', {})
+    return render_template('user-edit.html', user=user)    
 
 @app.route("/home")
 def Home():
