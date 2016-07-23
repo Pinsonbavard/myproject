@@ -63,13 +63,29 @@ class Destinations(db.Model):
     gateway = db.Column(db.Text, nullable=False)
     channel = db.Column(db.Text, nullable=False)
     own = db.Column(db.Text, nullable=False)
-    number = db.Column(db.String(50), nullable=False)
+    number = db.Column(db.Unicode(50), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_by = db.Column(db.Integer,nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
-    expire_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    expire_date = db.Column(db.DateTime, nullable=False)
     record = db.Column(db.Integer, nullable=False)
     auth_did = db.Column(db.Integer, nullable=False)
     auth_gw  = db.Column(db.Integer, nullable=False)
+
+    def __init__(self,user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date,created_by):
+
+        self.did = did
+        self.created_by = created_by
+        self.user_id = user_id
+        self.number = number
+        self.record = record
+        self.auth_gw = auth_gw
+        self.auth_did = auth_did
+        self.gateway = gateway
+        self.channel = channel
+        self.own = own
+        self.expire_date = end_date
+
     
 
 class Calls(db.Model):
@@ -100,6 +116,7 @@ class Did(db.Model):
     capacity = db.Column(db.Integer, nullable=False)
     mode = db.Column(db.String(30), nullable=False)
     pin = db.Column(db.String(10), nullable=False)
+    available = db.Column(db.String(10), nullable=False, default='YES')
 
     def __init__(self,phone,user_id,provider,cost,country,capacity,mode,pin):
 
@@ -169,15 +186,31 @@ class System():
         user = Users.query.filter_by(email=email).first()
         return user
 
+
     def getUserById(self,id):
 
         user = Users.query.filter_by(id=id).first()
+        return user
+
+    def getUserByPhone(self,phone):
+
+        user = Users.query.filter_by(number=phone).first()
         return user
 
     def dids(self):
 
         dids = Did.query.all()
         return dids
+
+    def available_dids(self):
+
+        dids = Did.query.filter_by(available='YES').all()
+        return dids
+
+    def this_did(self,did):
+
+        did = Did.query.filter_by(phone=did).first()
+        return did
 
     def owns(self):
 
@@ -188,6 +221,7 @@ class System():
 
         customers = Users.query.filter_by(user_type='USER').all()
         return customers
+
 
     def pins(self):
 
@@ -264,7 +298,8 @@ class System():
             did = Did(data[0],"SYSTEM",data[3],data[2],data[1],data[4],data[5],data[6])
             db.session.add(did)
 
-        db.session.commit()        
+        db.session.commit()
+        db.session.close()        
         return data_list_length
 
     def insertOwns(self,dataList):
@@ -275,13 +310,14 @@ class System():
             own = Own(data[0],data[1],"SYSTEM")
             db.session.add(own)
 
-        db.session.commit()        
+        db.session.commit()
+        db.session.close()        
         return data_list_length
 
             
 
 
-class User(Users):
+class User():
 
     def __init__(self,email):
 
@@ -290,26 +326,62 @@ class User(Users):
     def find(self):
 
         exist = db.session.query(Users).filter_by(email=self.email).first()
+        db.session.close()
         return exist
 
     def findCountry(self,country):
         exist = db.session.query(exists().where(Country.country == country)).scalar()
+        db.session.close()
         return exist
+
+    def check_destination(self,user_id,destination_phone):
+
+        exist = db.session.query(Destinations).filter_by(number=destination_phone,user_id=user_id).first()
+        db.session.close()
+        return exist
+
+
+    def destination_new(self,user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date):
+
+        if not self.check_destination(user_id,number):
+
+            ### INSERT INTO Destinations table
+
+            user = self.find()
+            created_by = user.id
+
+            destination = Destinations(user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date,created_by)
+            
+            try:
+
+                this_did = System().this_did(did)
+                this_did.available = 'NO'
+                db.session.add(destination)
+                db.session.commit()
+                db.session.close()
+                return 0
+            except:
+                return 506
+        return 1
+
+
 
 
     def checkDid(self, phone):
 
         exist = db.session.query(exists().where(Did.phone == phone)).scalar()
+        db.session.close()
         return exist
 
     def checkSim(self, sim):
 
         exist = db.session.query(exists().where(Own.sim == sim)).scalar()
+        db.session.close()
         return exist
 
     def createCustomer(self,firstname,lastname,email,number,user_type='USER',account=None):
 
-        if not System().getUser(email):
+        if not System().getUserByPhone(number):
 
             ### INSERT INTO USER with customer
             user = self.find()
@@ -317,6 +389,7 @@ class User(Users):
             customer = Users(firstname,lastname,email,account,number,user_id,user_type)
             db.session.add(customer)
             db.session.commit()
+            db.session.close()
             return 0
 
         return 1
@@ -335,6 +408,7 @@ class User(Users):
 
                 db.session.add(own)
                 db.session.commit()
+                db.session.close()
                 return 0
             except:
                 return 506
@@ -353,6 +427,7 @@ class User(Users):
 
                 db.session.add(country)
                 db.session.commit()
+                db.session.close()
                 return 0
             except:
                 return 506
@@ -371,6 +446,7 @@ class User(Users):
             did = Did(phone,user_id,provider,cost,country,capacity,mode,pin)
             db.session.add(did)
             db.session.commit()
+            db.session.close()
             return 0
 
         return 1
@@ -379,7 +455,7 @@ class User(Users):
     def verify(self, account):
 
         exist = db.session.query(Users).filter_by(email=self.email,account=account).first()
-
+        db.session.close()
         return exist
 
     def login(self,account):
@@ -409,6 +485,7 @@ class User(Users):
 
         try:
             db.session.commit()
+            db.session.close()
         except:
             return 506 ### Data insertion error
 
@@ -425,6 +502,7 @@ class User(Users):
             user = Users(firstname,lastname,email,account,number)
             db.session.add(user)
             db.session.commit()
+            db.session.close()
             return 0
         return 1
 

@@ -91,6 +91,7 @@
 		<th>Pin</th>
 		<th>Created by</th>
 		<th>Created date</th>
+		<th>Available</th>
 	</tr>
 	{% for did in dids%}
 	<tr>
@@ -102,6 +103,7 @@
 		<td>{{did.pin}}</td>
 		<td>{{did.created_by | User }}</td>
 		<td>{{did.created_date | humandatetime | safe}}</td>
+		<td>{{did.available}}</td>
 	</tr>
 	{% endfor %}
 </table>

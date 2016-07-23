@@ -29,7 +29,7 @@ from werkzeug import secure_filename
 
     
 
-e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=299)
+#e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=280)
 
 #e = create_engine("mysql://firsvat:Firsvat@2016@98.102.204.204:3306/firsvat", pool_recycle=3600)
 
@@ -42,7 +42,8 @@ def ensure_dir(d):
 
         os.makedirs(d)
 
-
+app.config['SQLALCHEMY_POOL_SIZE'] = 100
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
 app.config['UPLOAD_FOLDER'] = 'C:/Users/pinso/Desktop/uploads/'
 app.config["MAIL_SERVER"] = "smtp.pepipost.com"
 app.config["MAIL_PORT"] = 25
@@ -172,7 +173,7 @@ def users():
         login_user = system.getUser(session.get('username'))
         customers = system.customers()
         return render_template('users.html', login_user=login_user, customers=customers)
-    return redirect(url_for("Index"))
+    return redirect('/')
 
 @app.route('/customers/create', methods=['POST','GET'])
 def user_create():
@@ -187,7 +188,7 @@ def user_create():
 
             firstname = request.form['firstname']
             lastname = request.form['lastname']
-            email_cust = request.form['email_cust']
+            email_cust = request.form['email_cust'] or None
             origin = request.form['number']
 
             if len(firstname) < 1:
@@ -196,42 +197,114 @@ def user_create():
                 abort(400, 'Enter lastname')
             elif len(origin) < 1:
                 abort(400, 'Enter phone number')
-            elif len(email_cust) < 1:
-                abort(400, 'Enter email address')
+
             email = session.get('username')
             response = User(email).createCustomer(firstname,lastname,email_cust,origin)
             if response == 0:
 
                 error = firstname + ' ' + lastname + ' is added Successfully'
                 flash("Customer added Successfully")
-                msg = Message("Registration successfull, your registration details ",sender=app.config["DEFAULT_MAIL_SENDER"],recipients=[email_cust])
-                msg.html = render_template("reg-email.html",firstname=firstname,lastname=lastname,email=email_cust)
-                thr = Thread(target=send_async_email_test, args=[app, msg])
-                thr.start()
+                if email_cust is not None:
+
+                    msg = Message("Registration successfull, your registration details ",sender=app.config["DEFAULT_MAIL_SENDER"],recipients=[email_cust])
+                    msg.html = render_template("reg-email.html",firstname=firstname,lastname=lastname,email=email_cust)
+                    thr = Thread(target=send_async_email_test, args=[app, msg])
+                    thr.start()
                 return render_template('user-create.html', login_user=login_user, error=error)
 
             if response == 1:
 
-                error = email_cust + ' already exist, so no record created'
+                error = origin + ' already exist, so no record created'
                 return render_template('user-create.html', login_user=login_user, error=error)
 
         return render_template('user-create.html', login_user=login_user)
     return redirect('/')
 
 
-@app.route('/customers/<int:user_id>/edit')
-@app.route('/customers/edit')
-def user_edit(user_id=None):
-    user = session.get('saved-user', {})
-    if not user and user_id:
-        cur = g.db.cursor()
-        cur.execute('select * from users where id=%s', (user_id,))
-        user = cur.fetchone()
+@app.route('/customers/<int:user_id>')
+def user(user_id=None):
+
+    if session.get('username'):
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        user = system.getUserById(user_id)
         if not user:
             return redirect('/customers')
-#   else:
-#       user = session.pop('saved-user', {})
-    return render_template('user-edit.html', user=user)    
+        return render_template('user.html', login_user=login_user, user=user)
+
+    return redirect('/') 
+
+@app.route('/customers/<int:user_id>/edit', methods=['GET','POST'])
+@app.route('/customers/edit')
+def user_edit(user_id=None):
+
+    if session.get('username'):
+
+        system = System()
+        login_user = system.getUser(session.get('username'))
+        user = system.getUserById(user_id)
+        error = None
+        if not user:
+            return redirect('/customers')
+        if request.method == 'POST':
+
+            firstname = request.form['first_name']
+            lastname = request.form['last_name']
+            origin = request.form['number']
+            user.first_name =firstname
+            user.last_name =lastname
+            user.number =origin
+            try:
+                db.session.commit()
+                error = "Update successfull"
+            except:
+                error = "No update made, check Internet connectivity"
+            return render_template('user-edit.html', login_user=login_user, user=user, error=error)
+        return render_template('user-edit.html', login_user=login_user, user=user, error=error)
+
+    return redirect('/')
+    
+@app.route('/customers/<int:user_id>/destinations', methods=['GET','POST'])
+def destination_new(user_id):
+
+    if session.get('username'):
+
+        system = System()
+        dids = system.available_dids()
+        owns = system.owns()
+        login_user = system.getUser(session.get('username'))
+        user = system.getUserById(user_id)
+        error = None
+        if not user:
+            return redirect('/customers')
+
+        if request.method == 'POST':
+
+            did = request.form['did']
+            own = request.form['own']
+            record = request.form['record']
+            auth_gw = request.form['auth_gw']
+            auth_did = request.form['auth_did']
+            gateway = request.form['gateway']
+            channel = request.form['channel']
+            number = request.form['number']
+            day = request.form['day']
+            month = request.form['month']
+            year = request.form['year']
+            string_date = year + '-' + month + '-' + day + ' 12:00:00'
+            end_date = datetime.datetime.strptime(string_date, "%Y-%m-%d %H:%M:%S")
+            email = session.get('username')
+            response = User(email).destination_new(user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date)
+            if response == 0:
+                
+                error = "Destination created for origin "
+            if response == 1:
+                error = " Destination number already exist with origin " 
+            return render_template('destination-new.html', login_user=login_user, user=user, error=error, dids=dids, owns=owns)
+        return render_template('destination-new.html', login_user=login_user, user=user, error=error, dids=dids, owns=owns)
+
+    return redirect('/')
+
 
 @app.route("/home")
 def Home():
@@ -437,7 +510,7 @@ def Did():
 
                     flash('DID Successfully created')
                     error = 'DID Successfully created with pin '+pin
-                    return render_template('did.html', login_user=login_user, error=error, dids=dids, countries=countries)
+                    return render_template('did.html', login_user=login_user, error=error, dids=dids, pins=pins, countries=countries)
 
                 elif response == 1:
 
@@ -472,7 +545,7 @@ def Did():
 
                 error = 'File format is not allowed'
 
-            return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids,countries=countries)
+            return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids,pins=pins,countries=countries)
 
         return render_template('did.html', login_user=login_user, error=error, pins=pins, dids=dids,countries=countries)
 
@@ -511,5 +584,5 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    #app.run(debug=True,port=90)
+    ##app.run(debug=True,port=90)
     app.run()

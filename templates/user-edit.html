@@ -3,27 +3,28 @@
 {% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
 {% block content %}
 <h1>Edit customer</h1>
-<form action="/save-customer" method="post">
+<form action="/customers/{{user.id}}/edit" method="post">
 	<div>
 		<label for="first_name">First Name</label>
-		<input id="first_name" name="first_name" value="{{login_user.first_name}}" />
+		<input id="first_name" name="first_name" value="{{user.first_name}}" />
 		
 	</div>
 	<div>
 		<label for="last_name">Last Name</label>
-		<input id="last_name" name="last_name" value="{{login_user.last_name}}" />
+		<input id="last_name" name="last_name" value="{{user.last_name}}" />
 		
 	</div>
 	<div>
 		<label for="number">Origin</label>
-		<input id="number" name="number" value="{{login_user.number}}" />
+		<input id="number" name="number" value="{{user.number}}" />
 		
 	</div>
 	<div>
-		{% if login_user.id %}
-			<input type="hidden" name="id" value="{{login_user.id}}" />
+		{% if user.id %}
+			<input type="hidden" name="id" value="{{user.id}}" />
 		{% endif %}
-		<button>Save</button>
+		<button>Save for {{user.first_name}}</button>
 	</div>
 </form>
+<strong>{% if error != None %} {{error}} {% endif %}</strong>
 {% endblock %}

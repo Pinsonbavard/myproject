@@ -41,13 +41,13 @@
 				<td>
 					
 					{% for destination in customer.destinations %}
-						{{destination.created|humandatetime|safe}}<br />
+						{{destination.created_date|humandatetime|safe}}<br />
 					{% endfor %}
 				</td>
 				<td>
 					
 					{% for destination in customer.destinations %}
-						{% if destination.expires %}{{destination.expires|humandatetime|safe}}{% endif %}<br />
+						{% if destination.expire_date %}{{destination.expire_date|humandatetime|safe}}{% endif %}<br />
 					{% endfor %}
 				</td>
 				<td>

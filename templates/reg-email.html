@@ -178,7 +178,7 @@
           <div>Email : <strong>{{email}}</strong></div>
           {% if account  %}<div>Account : <strong>{{account}}</strong></div>{% endif %}
         </div>
-        <p style="padding: 30px;">The above detail should be use for login. Thanks</p>
+        {% if account  %}<p style="padding: 30px;">The above detail should be use for login. Thanks</p>{% endif %}
         <span class="divider_gray"></span>
         <div class="footer">
           <span class="unsub">All Rights Reserved at SinLimites Inc</span>
