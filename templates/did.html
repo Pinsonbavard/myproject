@@ -91,6 +91,7 @@
 		<th>Pin</th>
 		<th>Created by</th>
 		<th>Created date</th>
+		<th>Used for</th>
 		<th>Available</th>
 	</tr>
 	{% for did in dids%}
@@ -103,6 +104,7 @@
 		<td>{{did.pin}}</td>
 		<td>{{did.created_by | User }}</td>
 		<td>{{did.created_date | humandatetime | safe}}</td>
+		<td>{{did.phone | DestinationUserId | User | safe}}</td>
 		<td>{{did.available}}</td>
 	</tr>
 	{% endfor %}

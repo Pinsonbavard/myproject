@@ -192,6 +192,11 @@ class System():
         user = Users.query.filter_by(id=id).first()
         return user
 
+    def getDestinationByDid(self,did):
+
+        destination = Destinations.query.filter_by(did=did).first()
+        return destination
+
     def getUserByPhone(self,phone):
 
         user = Users.query.filter_by(number=phone).first()

@@ -76,6 +76,15 @@ def _jinja2_filter_user(id):
         return "SYSTEM"
     return user.first_name + ' '+ user.last_name
 
+@app.template_filter('DestinationUserId')
+def _jinja2_filter_destination(did):
+
+    system = System()
+    destination = system.getDestinationByDid(did)
+    if destination is None:
+        return "Nobody"
+    return destination.user_id
+
 @app.template_filter('humandatetime')
 def _jinja2_filter_humandatetime(date):
     date = date.replace(tzinfo=None)
