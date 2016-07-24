@@ -96,7 +96,7 @@ class Ipfilters(db.Model):
     target = db.Column(db.String(10), nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
 
-    def __init__(self,ip,location,target):
+    def __init__(self,ip,target,location=None):
 
         self.ip = ip
         self.target = target
