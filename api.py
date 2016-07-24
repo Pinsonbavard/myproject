@@ -23,7 +23,7 @@ from time import strftime, gmtime, localtime
 import os
 #from path import path
 from werkzeug import secure_filename
-from socket import gethostname, gethostbyname 
+from socket import gethostname, gethostbyname
 
 
 
@@ -322,7 +322,8 @@ def Home():
 
     if session.get('username'):
 
-        ip = gethostbyname(gethostname()) 
+        #ip = gethostbyname(gethostname()) 
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
         login_user = system.getUser(session.get('username'))
         return render_template('home.html', login_user=login_user, ip=ip)
@@ -595,5 +596,5 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    ##app.run(debug=True,port=90)
+    #app.run(debug=True,port=90)
     app.run()
