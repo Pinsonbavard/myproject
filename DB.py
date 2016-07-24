@@ -86,6 +86,22 @@ class Destinations(db.Model):
         self.own = own
         self.expire_date = end_date
 
+
+class Ipfilters(db.Model):
+    __tablename__ = 'ipfilters'
+    import datetime
+    id = db.Column(db.Integer, primary_key = True)
+    ip = db.Column(db.Unicode(50), nullable=False)
+    location = db.Column(db.String(20), nullable=True)
+    target = db.Column(db.String(10), nullable=False)
+    created_date = db.Column(db.DateTime, default=datetime.datetime.now())
+
+    def __init__(self,ip,location,target):
+
+        self.ip = ip
+        self.target = target
+        self.location = location
+
     
 
 class Calls(db.Model):
