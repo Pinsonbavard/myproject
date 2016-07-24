@@ -33,7 +33,7 @@ def dropAllInbound():
     rule.target = iptc.Target(rule, 'DROP')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"DROP")
+    System().insertIp(ip,"DROP")
 
 def allowLoopback():
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
@@ -42,7 +42,7 @@ def allowLoopback():
     rule.target = iptc.Target(rule, 'ACCEPT')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"ACCEPT")
+    System().insertIp(ip,"ACCEPT")
 
 def allowEstablishedInbound():
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
@@ -52,7 +52,7 @@ def allowEstablishedInbound():
     rule.target = iptc.Target(rule, 'ACCEPT')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"ACCEPT")
+    System().insertIp(ip,"ACCEPT")
 
 def allowHTTP():
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
@@ -64,7 +64,7 @@ def allowHTTP():
     rule.target = iptc.Target(rule, 'ACCEPT')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"ACCEPT")
+    System().insertIp(ip,"ACCEPT")
 
 def allowHTTPS():
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
@@ -76,7 +76,7 @@ def allowHTTPS():
     rule.target = iptc.Target(rule, 'ACCEPT')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"ACCEPT")
+    System().insertIp(ip,"ACCEPT")
 
 def allowSSH():
 
@@ -89,7 +89,7 @@ def allowSSH():
     rule.target = iptc.Target(rule, 'ACCEPT')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"ACCEPT")
+    System().insertIp(ip,"ACCEPT")
 
 def allowEstablishedOutbound():
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
@@ -99,7 +99,7 @@ def allowEstablishedOutbound():
     rule.target = iptc.Target(rule, 'ACCEPT')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"ACCEPT")
+    System().insertIp(ip,"ACCEPT")
 
 def dropAllOutbound():
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
@@ -108,7 +108,7 @@ def dropAllOutbound():
     rule.target = iptc.Target(rule, 'DROP')
     chain.insert_rule(rule)
     ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,None,"DROP")
+    System().insertIp(ip,"DROP")
 
 def defaultAction():
     
@@ -412,7 +412,7 @@ def Home():
     if session.get('username'):
 
         #ip = gethostbyname(gethostname()) 
-        #ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
         login_user = system.getUser(session.get('username'))
         defaultAction()
