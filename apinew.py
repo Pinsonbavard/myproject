@@ -24,6 +24,100 @@ import os
 #from path import path
 from werkzeug import secure_filename
 from socket import gethostname, gethostbyname
+import iptc
+
+def dropAllInbound():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    rule = iptc.Rule()
+    rule.in_interface = 'eth+'
+    rule.target = iptc.Target(rule, 'DROP')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"DROP")
+
+def allowLoopback():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    rule = iptc.Rule()
+    rule.in_interface = 'lo'
+    rule.target = iptc.Target(rule, 'ACCEPT')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"ACCEPT")
+
+def allowEstablishedInbound():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    rule = iptc.Rule()
+    match = rule.create_match('state')
+    match.state = 'RELATED,ESTABLISHED'
+    rule.target = iptc.Target(rule, 'ACCEPT')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"ACCEPT")
+
+def allowHTTP():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    rule = iptc.Rule()
+    rule.in_interface = 'eth+'
+    rule.protocol = 'tcp'
+    match = rule.create_match('tcp')
+    match.dport = '80'
+    rule.target = iptc.Target(rule, 'ACCEPT')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"ACCEPT")
+
+def allowHTTPS():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    rule = iptc.Rule()
+    rule.in_interface = 'eth+'
+    rule.protocol = 'tcp'
+    match = rule.create_match('tcp')
+    match.dport = '443'
+    rule.target = iptc.Target(rule, 'ACCEPT')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"ACCEPT")
+
+def allowSSH():
+
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    rule = iptc.Rule()
+    rule.in_interface = 'eth+'
+    rule.protocol = 'tcp'
+    match = rule.create_match('tcp')
+    match.dport = '22'
+    rule.target = iptc.Target(rule, 'ACCEPT')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"ACCEPT")
+
+def allowEstablishedOutbound():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
+    rule = iptc.Rule()
+    match = rule.create_match('state')
+    match.state = 'RELATED,ESTABLISHED'
+    rule.target = iptc.Target(rule, 'ACCEPT')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"ACCEPT")
+
+def dropAllOutbound():
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
+    rule = iptc.Rule()
+    rule.in_interface = 'eth+'
+    rule.target = iptc.Target(rule, 'DROP')
+    chain.insert_rule(rule)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    System().insertIp(ip,None,"DROP")
+
+def defaultAction():
+    
+    dropAllOutbound()
+    dropAllInbound()
+    allowLoopback()
+    allowEstablishedInbound()
+    allowEstablishedOutbound()
+
     
 
 #e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=280)
@@ -321,6 +415,7 @@ def Home():
         #ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
         login_user = system.getUser(session.get('username'))
+        defaultAction()
         return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))
 
