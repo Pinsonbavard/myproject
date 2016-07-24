@@ -23,6 +23,8 @@ from time import strftime, gmtime, localtime
 import os
 #from path import path
 from werkzeug import secure_filename
+from socket import gethostname, gethostbyname 
+
 
 
 
@@ -320,10 +322,10 @@ def Home():
 
     if session.get('username'):
 
-
+        ip = gethostbyname(gethostname()) 
         system = System()
         login_user = system.getUser(session.get('username'))
-        return render_template('home.html', login_user=login_user)
+        return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))
 
 
