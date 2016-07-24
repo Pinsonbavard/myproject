@@ -679,12 +679,3 @@ def send_async_email_test(app,msg):
     
         
     
-    
-if __name__ == "__main__":
-    
-    
-    
-    ##db.session.rollback() 
-    #db.session.commit()
-    #app.run(debug=True,port=90)
-    app.run()
