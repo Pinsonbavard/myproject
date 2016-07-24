@@ -96,7 +96,7 @@ class Ipfilters(db.Model):
     target = db.Column(db.String(10), nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
 
-    def __init__(self,ip,target,location=None):
+    def __init__(self,ip,target,location):
 
         self.ip = ip
         self.target = target
@@ -197,9 +197,9 @@ class Country(db.Model):
 
 class System():
 
-    def insertIp(ip,location=None,target):
+    def insertIp(ip,target,location=None):
 
-        iprecord = Ipfilters(ip,location,target)
+        iprecord = Ipfilters(ip,target,location)
         db.session.add(iprecord)
         db.session.commit()
         db.session.close()
