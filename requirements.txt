@@ -14,7 +14,7 @@ MySQL-python==1.2.5
 python-dateutil==2.4.2
 python-mimeparse==1.5.1
 requests==2.9.1
-SQLAlchemy==1.0.11
+SQLAlchemy
 Werkzeug==0.11.3
 virtualenv==1.11.6
 wheel==0.26.0
