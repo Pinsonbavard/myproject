@@ -41,7 +41,7 @@ def ensure_dir(d):
 
 app.config['SQLALCHEMY_POOL_SIZE'] = 100
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
-app.config['UPLOAD_FOLDER'] = 'C:/Users/pinso/Desktop/uploads/'
+app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config["MAIL_SERVER"] = "smtp.pepipost.com"
 app.config["MAIL_PORT"] = 25
 #app.config["MAIL_USE_TLS"] = True
