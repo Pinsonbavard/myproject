@@ -325,9 +325,10 @@ class System():
             #### INSERT INTO did table
             did = Did(data[0],"SYSTEM",data[3],data[2],data[1],data[4],data[5],data[6])
             db.session.add(did)
+            db.session.commit()
 
-        db.session.commit()
-        db.session.close()        
+        
+        #db.session.close()        
         return data_list_length
 
     def insertOwns(self,dataList):
@@ -337,9 +338,10 @@ class System():
             #### INSERT INTO did table
             own = Own(data[0],data[1],"SYSTEM")
             db.session.add(own)
+            db.session.commit()
 
-        db.session.commit()
-        db.session.close()        
+        
+        #db.session.close()        
         return data_list_length
 
             

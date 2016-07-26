@@ -441,10 +441,11 @@ def Own():
                     #fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
 
                     error = 'File uploaded : Path -> ' + fileUrl
-                    data_list_owns = System().readCSV(fileUrl)
-                    insert_owns = System().insertOwns(data_list_owns)
+                    data_list_owns = system.readCSV(fileUrl)
+                    insert_owns = system.insertOwns(data_list_owns)
 
                     error =  str(insert_owns) + ' OWN has been uploaded and saved'
+                    #error =  data_list_owns
 
                 except:
 
@@ -591,6 +592,6 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    ##app.run(debug=True,port=90)
+    #app.run(debug=True,port=90)
     #app.run()
     app.run(host='0.0.0.0')
