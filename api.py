@@ -592,4 +592,5 @@ if __name__ == "__main__":
     ##db.session.rollback() 
     #db.session.commit()
     ##app.run(debug=True,port=90)
-    app.run()
+    #app.run()
+    app.run(host='163.172.172.165')
