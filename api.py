@@ -101,6 +101,7 @@ def allowEstablishedOutbound():
     System().insertIp(ip,"ACCEPT")
 
 def dropAllOutbound():
+
     chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
     rule = iptc.Rule()
     rule.in_interface = 'eth+'
@@ -110,6 +111,7 @@ def dropAllOutbound():
     System().insertIp(ip,"DROP")
 
 def defaultAction():
+
     
     dropAllOutbound()
     dropAllInbound()
@@ -412,8 +414,8 @@ def Home():
 
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
-        defaultAction()
         system = System()
+        #defaultAction()
         login_user = system.getUser(session.get('username'))
         return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))
