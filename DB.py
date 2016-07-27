@@ -95,8 +95,8 @@ class Ipfilters(db.Model):
     ip = db.Column(db.Unicode(50), nullable=False)
     location = db.Column(db.String(20), nullable=True)
     target = db.Column(db.String(10), nullable=False)
-    mode_type = db.Column(db.String(30), nullable=False)
-    interface = db.Column(db.String(10), nullable=False)
+    mode_type = db.Column(db.String(30), nullable=True)
+    interface = db.Column(db.String(10), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
 
     def __init__(self,ip,target, mode_type, interface, location=None):
