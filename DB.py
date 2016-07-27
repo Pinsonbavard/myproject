@@ -211,6 +211,7 @@ class System():
         db.session.commit()
 
     def allowLoopback(self):
+        
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
         rule = iptc.Rule()
         rule.in_interface = 'lo'
