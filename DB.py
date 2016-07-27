@@ -95,13 +95,17 @@ class Ipfilters(db.Model):
     ip = db.Column(db.Unicode(50), nullable=False)
     location = db.Column(db.String(20), nullable=True)
     target = db.Column(db.String(10), nullable=False)
+    mode_type = db.Column(db.String(30), nullable=False)
+    interface = db.Column(db.String(10), nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
 
-    def __init__(self,ip,target):
+    def __init__(self,ip,target, mode_type, interface, location=None):
 
         self.ip = ip
         self.target = target
-        #self.location = location
+        self.mode_type = mode_type
+        self.interface = interface
+        self.location = location
 
     
 
@@ -206,7 +210,7 @@ class System():
         rule.target = iptc.Target(rule, 'DROP')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"DROP")
+        iprecord = Ipfilters(ip,"DROP","dropAllInbound","eth+")
         db.session.add(iprecord)
         db.session.commit()
 
@@ -218,7 +222,7 @@ class System():
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT")
+        iprecord = Ipfilters(ip,"ACCEPT","allowLoopback","lo")
         db.session.add(iprecord)
         db.session.commit()
 
@@ -230,7 +234,7 @@ class System():
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT")
+        iprecord = Ipfilters(ip,"ACCEPT","allowEstablishedInbound","related-established")
         db.session.add(iprecord)
         db.session.commit()
 
@@ -244,7 +248,7 @@ class System():
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT")
+        iprecord = Ipfilters(ip,"ACCEPT","allowHTTP","eth+_tcp_prt80")
         db.session.add(iprecord)
         db.session.commit()
 
@@ -258,7 +262,7 @@ class System():
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT")
+        iprecord = Ipfilters(ip,"ACCEPT","allowHTTPS","eth+_tcp_prt443")
         db.session.add(iprecord)
         db.session.commit()
 
@@ -273,7 +277,8 @@ class System():
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT")
+        iprecord = Ipfilters(ip,"ACCEPT","allowSSH","eth+_tcp_prt22")
+        db.session.add(iprecord)
         db.session.add(iprecord)
         db.session.commit()
 
@@ -285,7 +290,7 @@ class System():
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT")
+        iprecord = Ipfilters(ip,"ACCEPT","allowEstablishedOutbound","related-established-OUTPUT")
         db.session.add(iprecord)
         db.session.commit()
 
@@ -297,7 +302,7 @@ class System():
         rule.target = iptc.Target(rule, 'DROP')
         chain.insert_rule(rule)
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"DROP")
+        iprecord = Ipfilters(ip,"DROP","dropAllOutbound","eth+_OUTPUT")
         db.session.add(iprecord)
         db.session.commit()
 
