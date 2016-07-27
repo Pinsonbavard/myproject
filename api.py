@@ -412,6 +412,7 @@ def Home():
 
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
+        defaultAction()
         system = System()
         login_user = system.getUser(session.get('username'))
         return render_template('home.html', login_user=login_user, ip=ip)
@@ -682,7 +683,7 @@ def send_async_email_test(app,msg):
 if __name__ == "__main__":
     
     
-    defaultAction()
+    
     ##db.session.rollback() 
     #db.session.commit()
     #app.run(debug=True,port=90)
