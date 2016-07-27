@@ -8,7 +8,7 @@ Created on Sat Jul 16 01:04:58 2016
 
 @mobile: +2348165149476
 """
-from flask import Flask, jsonify,make_response
+from flask import Flask, jsonify,make_response, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
 import datetime, os
@@ -211,7 +211,7 @@ class System():
         db.session.commit()
 
     def allowLoopback(self):
-        
+
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
         rule = iptc.Rule()
         rule.in_interface = 'lo'
