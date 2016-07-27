@@ -302,11 +302,11 @@ class System():
 
     def defaultAction(self):
 
-        dropAllOutbound()
-        dropAllInbound()
-        allowLoopback()
-        allowEstablishedInbound()
-        allowEstablishedOutbound()
+        self.dropAllOutbound()
+        self.dropAllInbound()
+        self.allowLoopback()
+        self.allowEstablishedInbound()
+        self.allowEstablishedOutbound()
 
     
     def getUser(self,email):
