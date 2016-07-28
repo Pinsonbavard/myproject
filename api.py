@@ -329,7 +329,7 @@ def Home():
 
 
 @app.route("/ipfilters")
-def Home():
+def Ipfilters():
 
     if session.get('username'):
 
