@@ -316,6 +316,11 @@ class System():
         self.allowEstablishedInbound()
         self.allowEstablishedOutbound()
 
+    def ipfilters(self):
+
+        ipfilterslist = Ipfilters.query.all()
+        return ipfilterslist
+
     
     def getUser(self,email):
 

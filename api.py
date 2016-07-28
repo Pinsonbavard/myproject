@@ -328,6 +328,19 @@ def Home():
     return redirect(url_for("Index"))
 
 
+@app.route("/ipfilters")
+def Home():
+
+    if session.get('username'):
+
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
+        system = System()
+        ipfilters = system.ipfilters()
+        login_user = system.getUser(session.get('username'))
+        return render_template('ipfilters.html', login_user=login_user, ip=ip, ipfilters=ipfilters)
+    return redirect(url_for("Index"))
+
+
 @app.route("/pin", methods=['POST','GET']) 
 def Pin():
 
