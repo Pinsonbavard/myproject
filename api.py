@@ -24,6 +24,7 @@ import os
 #from path import path
 from werkzeug import secure_filename
 import iptc
+from geoip import geolite2
 
 
     
@@ -74,6 +75,41 @@ def _jinja2_filter_user(id):
     if user is None:
         return "SYSTEM"
     return user.first_name + ' '+ user.last_name
+
+
+@app.template_filter('IpCountry')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.country
+
+@app.template_filter('IpContinent')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.continent
+
+@app.template_filter('Iptimezone')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.timezone
+
+
+@app.template_filter('Ipsubdivisions')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.subdivisions
+
 
 @app.template_filter('DestinationUserId')
 def _jinja2_filter_destination(did):

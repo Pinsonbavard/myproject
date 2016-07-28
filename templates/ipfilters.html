@@ -8,8 +8,11 @@
 <table>
 	<tr>
 		<th>IP address</th>
-		<th>location</th>
-		<th>coomand</th>
+		<th>Command</th>
+		<th>country</th>
+		<th>continent</th>
+		<th>timezone</th>
+		<th>sub-division</th>
 		<th>type</th>
 		<th>interface</th>
 		<th>Created by</th>
@@ -18,8 +21,11 @@
 	{% for ipfilter in ipfilters%}
 	<tr>
 		<td>{{ipfilter.ip}}</td>
-		<td>{{ipfilter.location}}</td>
 		<td>{{ipfilter.target}}</td>
+		<td>{{ipfilter.ip | IpCountry | safe}}</td>
+		<td>{{ipfilter.ip | IpContinent | safe}}</td>
+		<td>{{ipfilter.ip | Iptimezone | safe}}</td>
+		<td>{{ipfilter.ip | Ipsubdivisions | safe}}</td>
 		<td>{{ipfilter.mode_type}}</td>
 		<td>{{ipfilter.interface}}</td>
 		<td>SYSTEM</td>
