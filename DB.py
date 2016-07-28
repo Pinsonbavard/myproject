@@ -481,6 +481,7 @@ class User():
 
         exist = db.session.query(Destinations).filter_by(number=destination_phone,user_id=user_id).first()
         db.session.close()
+        #db.session.close()
         return exist
 
 
