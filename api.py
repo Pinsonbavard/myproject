@@ -25,6 +25,7 @@ import os
 from werkzeug import secure_filename
 import iptc
 from geoip import geolite2
+import requests
 
 
     
@@ -77,13 +78,51 @@ def _jinja2_filter_user(id):
     return user.first_name + ' '+ user.last_name
 
 
+@app.template_filter('IpCountryCode')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match is None:
+        return "Not found"
+    return match['country_code']
+
 @app.template_filter('IpCountry')
 def _jinja2_filter_user(ip):
 
-    match = geolite2.lookup(ip)
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
     if match is None:
         return "Not found"
-    return match.country
+    return match['country_name']
+
+
+@app.template_filter('IpCity')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match['city'] is None:
+        return "Not found"
+    return match['city']
+
+
+@app.template_filter('IpRegion')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match['region_name'] is None:
+        return "Not found"
+    return match['region_name']
 
 @app.template_filter('IpContinent')
 def _jinja2_filter_user(ip):

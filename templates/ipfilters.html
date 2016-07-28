@@ -9,10 +9,13 @@
 	<tr>
 		<th>IP address</th>
 		<th>Command</th>
+		<th>Country code</th>
 		<th>country</th>
+		<th>City</th>
+		<th>Region</th>
 		<th>continent</th>
 		<th>timezone</th>
-		<th>sub-division</th>
+		<th>sub-divisions</th>
 		<th>type</th>
 		<th>interface</th>
 		<th>Created by</th>
@@ -22,7 +25,10 @@
 	<tr>
 		<td>{{ipfilter.ip}}</td>
 		<td>{{ipfilter.target}}</td>
+		<td>{{ipfilter.ip | IpCountryCode | safe}}</td>
 		<td>{{ipfilter.ip | IpCountry | safe}}</td>
+		<td>{{ipfilter.ip | IpCity | safe}}</td>
+		<td>{{ipfilter.ip | IpRegion | safe}}</td>
 		<td>{{ipfilter.ip | IpContinent | safe}}</td>
 		<td>{{ipfilter.ip | Iptimezone | safe}}</td>
 		<td>{{ipfilter.ip | Ipsubdivisions | safe}}</td>
