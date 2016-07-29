@@ -218,11 +218,7 @@ def Register():
         return render_template('register.html', error=error)
     system = System()
     login_user = system.getUser(session.get('username'))
-<<<<<<< HEAD
     return redirect('/home')
-=======
-    return render_template('home.html', login_user=login_user)
->>>>>>> 4ac504472d3d6c2044e991c0ffb7a64719b4d762
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -250,11 +246,7 @@ def Login():
         return render_template('login.html')
     system = System()
     login_user = system.getUser(session.get('username'))
-<<<<<<< HEAD
     return redirect('/home')
-=======
-    return render_template('home.html', login_user=login_user)
->>>>>>> 4ac504472d3d6c2044e991c0ffb7a64719b4d762
 
 @app.route('/customers')
 def users():
