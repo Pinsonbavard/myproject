@@ -1,0 +1,218 @@
+@font-face {
+	font-family: 'Open Sans';
+	src: url(/static/fonts/OpenSans-Light.eot);
+	src: url("/static/fonts/OpenSans-Light.eot") format("embedded-opentype"),
+			url("/static/fonts/OpenSans-Light.woff2") format("woff2"),
+			url("/static/fonts/OpenSans-Light.woff") format("woff"),
+			url("/static/fonts/OpenSans-Light.ttf") format("truetype"),
+			url("/static/fonts/OpenSans-Light.svg") format("svg");
+	font-weight: 300;
+	font-style: normal;
+	}
+
+* {
+	margin: 0;
+	padding: 0;
+	}
+
+.error {
+	color: red;
+	display: block-inline;
+	vertical-align: top;
+	}
+
+html {
+	font-family: 'Open Sans';
+	font-weight: 300;
+	background-color: white;
+	overflow-y: scroll;
+	}
+
+body {
+	}
+
+#container {
+	xmargin: 10px auto;
+	xborder-radius: 5px;
+	background-color: #fff;
+	xbox-shadow: inset 0 2px 0 rgba(0,0,0,0.1);
+	xbox-shadow: 0 0 2px rgba(0,0,0,0.3),0 3px 5px rgba(0,0,0,0.2);
+	margin-bottom: 20px;
+	}
+
+#menu {
+	display: none;
+	position: absolute;
+	top: 10px;
+	xheight: 50px;
+	background-color: #333;
+	background: linear-gradient(#333,#000);
+	sborder-bottom: 1px solid #;
+	xbackground: linear-gradient(#508ad2,#2c619c);
+	padding: 10px 20px 0;
+	border-radius: 5px 5px 0 0;
+	clear: both;
+	}
+
+#menu a img {
+	border: none;
+	width: 153px;
+	height: 20px;
+	}
+
+#content {
+	padding: 20px 20px 20px;
+	}
+
+#footer {
+	xtext-align: center;
+	padding: 0 10px;
+	margin-bottom: 10px;
+	}
+
+h1 {
+	font-size: 42px;
+	font-weight: 300;
+	margin-bottom: 15px;
+	xcolor: #8fb63e;
+	}
+
+h2 {
+	font-size: 30px;
+	font-weight: 300;
+	margin: 10px 0;
+	color: #8fb63e;
+	}
+
+a {
+	color: #428bca;
+	color: #005cb8;
+	}
+
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	overflow-x: auto;
+	}
+
+tr.highlighted td {
+	background-color: #ffc;
+	}
+
+th {
+	color: #666;
+	border-bottom: 2px solid #ccc;
+	padding: 2px 5px;
+	text-align: left;
+	font-weight: normal;
+	font-size: 14px;
+	text-transform: uppercase;
+	}
+
+td {
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+	padding: 5px;
+	font-size: 14px;
+	vertical-align: top;
+	}
+
+.section {
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	}
+
+p {
+	line-height: 1.5em;
+	margin-bottom: 2em;
+	}
+
+ul {
+	line-height: 1.5em;
+	margin-bottom: 2em;
+	}
+
+ul li {
+	margin-left: 2em;
+	}
+
+form div {
+	padding-bottom: 10px;
+	clear: both;
+	}
+
+form fieldset {
+	padding: 10px;
+	border: 1px solid #ccc;
+	margin-bottom: 10px;
+	}
+
+form label {
+	width: 160px;
+	display: block;
+	float: left;
+	}
+
+form input {
+	border: 1px solid #ccc;
+	padding: 5px;
+	border-radius: 5px;
+	}
+
+form button {
+	margin-left: 160px;
+	}
+
+button {
+	background-color: #005cb8;
+	color: white;
+	border-radius: 3px;
+	border: none;
+	padding: 10px 20px;
+	cursor: pointer;
+	}
+
+button.standalone {
+	margin: 0;
+	}
+
+button.small {
+	padding: 3px 10px;
+	}
+
+.clear {
+	clear: both;
+	}
+
+.info {
+	color: #666;
+	font-size: smaller;
+	}
+
+.long {
+	width: 30em;
+	}
+
+.message {
+	padding: 10px;
+	background-color: #fcc;
+	}
+
+.date {
+	color: #999;
+	font-style: italic;
+	}
+
+@media screen and (min-device-width: 1024px) {
+
+	#container {
+		width: 1100px;
+	}
+
+	#menu {
+		width: 1060px;
+	}
+
+}

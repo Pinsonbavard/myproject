@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{% block title %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="/static/styles.css">
+		<link rel="stylesheet" type="text/css" href="/static/font-awesome.css">
+		<script type="text/javascript" src="/javascript/jquery/jquery.min.js"></script>
+	</head>
+	<body>
+		<div id="header">
+			<a href="/"><strong>Home</strong></a>
+			<a href="/customers"><strong>Customers</strong></a>
+			<a href="/calls"><strong>Calls</strong></a>
+			<a href="/login"><strong>Login</strong></a>
+			<a href="/register"><strong>Register</strong></a>
+		</div>
+		<div id="container">
+			<div id="content">
+				{% block content %}
+
+				{% endblock %}
+			</div>
+			<div id="menu">
+				<!--<a href="/"><img src="/static/logo.png" alt="" /></a>-->
+				<div class="clear"></div>
+			</div>
+		</div>
+		<div id="footer">
+			<a href="/"><strong>Home</strong></a>
+			<a href="/customers"><strong>Customers</strong></a>
+			<a href="/calls"><strong>Calls</strong></a>
+		</div>
+	</body>
+</html>

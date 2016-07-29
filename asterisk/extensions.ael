@@ -1,0 +1,135 @@
+context in {
+	_X! => {
+		MYSQL(Connect __con localhost root root switch);
+		Verbose(${EXTEN});
+		MYSQL(Query resultid ${con} select id,number,user_id,record,auth_did,gateway from destinations where did='${EXTEN}' and expires>utc_timestamp());
+		MYSQL(Fetch fetchid ${resultid} id number user_id record auth_did gateway);
+		MYSQL(Clear ${resultid});
+		if (${fetchid} = 0)
+			Hangup();
+		MYSQL(Query resultid ${con} select number from users where id=${user_id});
+		MYSQL(Fetch fetchid ${resultid} user_number);
+		MYSQL(Clear ${resultid});
+		if (${fetchid} = 0)
+			Hangup();
+		Verbose(${CALLERID(num)} ${user_number});
+		if ('${auth_did}' = '1' && '${CALLERID(num)}' != '${user_number}')
+			Hangup();
+		Set(CDR(accountcode)=${user_id});
+		Verbose(${id} ${number});
+		MYSQL(Query resultid ${con} insert into calls(date,user_id,source,destination,channel) values(utc_timestamp(),${user_id},'${CALLERID(num)}','${number}','${CHANNEL}'));
+		MYSQL(Query resultid ${con} select last_insert_id());
+		MYSQL(Fetch fetchid ${resultid} call_id);
+		MYSQL(Clear ${resultid});
+		Verbose(${call_id});
+		if (${record}) {
+			MixMonitor(${call_id}.wav,,cd /var/spool/asterisk/monitor; lame ${call_id}.wav ${call_id}.mp3; chmod o+r ${call_id}.mp3; rm -f ${call_id}.wav);
+			MYSQL(Query resultid ${con} update calls set has_recording=1 where id=${call_id});
+		}
+		if ('${gateway}' = '')
+			Set(gateway=default);
+		Dial(SIP/${number}@gateway-${gateway});
+	}
+
+	h => {
+		MYSQL(Query res ${con} update calls set status='${DIALSTATUS}',duration='${CDR(billsec)}' where id='${call_id}');
+		MYSQL(Disconnect ${con});
+	}
+
+	s => {
+		MYSQL(Connect __con localhost root root switch);
+		Verbose(${CALLERID(dnid)});
+		Verbose(${CALLERID(num)});
+		Verbose(${EXTEN});
+//		Hangup();
+		MYSQL(Query resultid ${con} select id,did,user_id,auth_gw from destinations where number='${CALLERID(num)}' and expires>utc_timestamp());
+		MYSQL(Fetch fetchid ${resultid} id did user_id auth_gw);
+		if (${fetchid} = 0)
+			Hangup();
+		Set(CDR(accountcode)=${user_id});
+		MYSQL(Query resultid ${con} select number from users where id=${user_id});
+		MYSQL(Fetch fetchid ${resultid} number);
+		if (${fetchid} = 0)
+			Hangup();
+		Verbose(${CALLERID(num)} ${number});
+//		if ('${auth_gw}' = '1' && '${CALLERID(num)}' != '${number}')
+//			Hangup();
+		Answer();
+		Playback(beep);
+		AGI(/srv/switch/callback.py,${CALLERID(num)},${number});
+	}
+}
+
+context callback-dial {
+	_X! => {
+		MYSQL(Connect __con localhost root root switch);
+		MYSQL(Query resultid ${con} select user_id,number,gateway from destinations where number='${EXTEN}' and expires>utc_timestamp());
+		MYSQL(Fetch fetchid ${resultid} user_id number gateway);
+		MYSQL(Clear ${resultid});
+		if (${fetchid} = 0)
+			Hangup();
+		Set(CDR(accountcode)=${user_id});
+		Verbose(${user_id} ${number});
+		if ('${gateway}' = '')
+			Set(gateway=default);
+		Wait(10);
+		MYSQL(Query resultid ${con} insert into calls(date,user_id,destination) values(utc_timestamp(),${user_id},'${number}'));
+		MYSQL(Query resultid ${con} select last_insert_id());
+		MYSQL(Fetch fetchid ${resultid} call_id);
+		MYSQL(Clear ${resultid});
+		Verbose(${call_id});
+		Dial(SIP/${EXTEN}@gateway-${gateway});
+	}
+
+	h => {
+		MYSQL(Query res ${con} update calls set status='${DIALSTATUS}',duration='${CDR(billsec)}' where id='${call_id}');
+		MYSQL(Disconnect ${con});
+	}
+}
+
+context callback-answer {
+	_X! => {
+		MYSQL(Connect __con localhost root root switch);
+		MYSQL(Query resultid ${con} select id,number from users where number='${EXTEN}');
+		MYSQL(Fetch fetchid ${resultid} user_id number);
+		MYSQL(Clear ${resultid});
+		if (${fetchid} = 0)
+			Hangup();
+		Set(CDR(accountcode)=${user_id});
+		Verbose(${user_id} ${number});
+		MYSQL(Query resultid ${con} insert into calls(date,user_id,destination,channel) values(utc_timestamp(),${user_id},'${number}','${CHANNEL}'));
+		MYSQL(Query resultid ${con} select last_insert_id());
+		MYSQL(Fetch fetchid ${resultid} call_id);
+		MYSQL(Clear ${resultid});
+		Verbose(${call_id});
+		if (${record}) {
+			MixMonitor(${call_id}.wav,,cd /var/spool/asterisk/monitor; lame ${call_id}.wav ${call_id}.mp3; chmod o+r ${call_id}.mp3; rm -f ${call_id}.wav);
+			MYSQL(Query resultid ${con} update calls set has_recording=1 where id=${call_id});
+		}
+		Answer();
+		Dial(SIP/0011101${EXTEN}@us-out, 60);
+	}
+
+	h => {
+		MYSQL(Query res ${con} update calls set status='${DIALSTATUS}',duration='${CDR(billsec)}' where id='${call_id}');
+		MYSQL(Disconnect ${con});
+	}
+}
+
+
+context extensions {
+	_X! => {
+		MYSQL(Connect __con localhost root root switch);
+		MYSQL(Query resultid ${con} select channel from calls where destination='${EXTEN}' and status is null);
+		MYSQL(Fetch fetchid ${resultid} channel);
+		MYSQL(Clear ${resultid});
+		if (${fetchid} = 1) {
+			ChanSpy(${channel});
+			Hangup();
+		}
+	}
+
+	h => {
+		MYSQL(Disconnect ${con});
+	}
+}

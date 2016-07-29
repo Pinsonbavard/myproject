@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Delete customer: {{user.first_name}} {{user.last_name}} - Switch{% endblock %}
+{% block content %}
+<h1>Delete customer: {{user.first_name}} {{user.last_name}}</h1>
+<form action="/customers/{{user.id}}/delete" method="post">
+	<button>Delete</button>
+</form>
+{% endblock %}

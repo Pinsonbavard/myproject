@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{% block title %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="/static/styles.css">
+		<link rel="stylesheet" type="text/css" href="/static/font-awesome.css">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+
+		    $("tr:even").css("background-color","silver");
+		    // rgba equivalent for yellow with 50% opacity
+		    $("tr:odd").css("background-color","#FFE");
+		});
+</script>
+	</head>
+	<body>
+	<div style="padding:15px 0 0 20px;">
+		<h1> Welcome {% block user %}{%endblock%}</h1>
+		<div id="header">
+			<a href="/ipfilters"><strong>IP filter</strong></a>
+			<a href="/did"><strong>DID</strong></a>
+			<a href="/customers"><strong>Customers</strong></a>
+			<a href="/pin"><strong>Pins</strong></a>
+			<a href="/own"><strong>Own</strong></a>
+			<a href="/countries"><strong>Countries</strong></a>
+			<a href="/calls"><strong>Calls</strong></a>
+			<a href="/logout"><strong>Logout</strong></a>
+		</div>
+		<div id="container">
+			<div id="content">
+				{% block content %}
+
+				{% endblock %}
+			</div>
+			<div id="menu">
+				<!--<a href="/"><img src="/static/logo.png" alt="" /></a>-->
+				<div class="clear"></div>
+			</div>
+		</div>
+	</div>	
+	</body>
+</html>

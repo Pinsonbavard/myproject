@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Edit destination - Switch{% endblock %}
+{% block content %}
+<h1>Edit destination</h1>
+<form action="/save-destination" method="post">
+	<div>
+		<label for="did">DID</label>
+		<input id="did" name="did" value="{{destination.did}}" />
+		{% if 'missing-did' in destination.errors %}
+			<span class="error">Missing DID</span>
+		{% endif %}
+	</div>
+	<div>
+		<label for="number">Destination</label>
+		<input id="number" name="number" value="{{destination.number}}" />
+		{% if 'missing-number' in destination.errors %}
+			<span class="error">Missing number</span>
+		{% endif %}
+	</div>
+	<div>
+		<label for="record">Record</label>
+		<input type="checkbox" id="record" name="record"{% if destination.record %} checked="checked"{% endif %}/>
+	</div>
+	<div>
+		<label for="auth_did">Auth DID</label>
+		<input type="checkbox" id="auth_did" name="auth_did"{% if destination.auth_did %} checked="checked"{% endif %}/>
+	</div>
+	<div>
+		<label for="auth_gw">Auth gateway</label>
+		<input type="checkbox" id="auth_gw" name="auth_gw"{% if destination.auth_gw %} checked="checked"{% endif %}/>
+	</div>
+	<div>
+		<label for="gateway">Gateway</label>
+		<input id="gateway" name="gateway" value="{{destination.gateway or ''}}" />
+	</div>
+	<div>
+		<label for="channel">Channel</label>
+		<input id="channel" name="channel" value="{{destination.channel or ''}}" />
+	</div>
+	<div>
+		<label for="own">Own</label>
+		<input id="own" name="own" value="{{destination.own or ''}}" />
+	</div>
+	<div>
+		<label for="day">End day</label>
+		<select id="day" name="day">
+			<option value="">--</option>
+			{% for day in range(1, 32) %}
+				<option{% if destination.day == day|string %} selected="selected"{% endif %}>{{day}}</option>
+			{% endfor %}
+		</select>
+		{% if 'missing-day' in destination.errors %}
+			<span class="error">Missing day</span>
+		{% endif %}
+		{% if 'invalid-date' in destination.errors %}
+			<span class="error">Invalid date</span>
+		{% endif %}
+	</div>
+	<div>
+		<label for="month">End month</label>
+		<select id="month" name="month">
+			<option value="">--</option>
+			{% for month in range(1, 13) %}
+				<option{% if destination.month == month|string %} selected="selected"{% endif %}>{{month}}</option>
+			{% endfor %}
+		</select>
+		{% if 'missing-month' in destination.errors %}
+			<span class="error">Missing month</span>
+		{% endif %}
+	</div>
+	<div>
+		<label for="year">End year</label>
+		<select id="year" name="year">
+			<option value="">--</option>
+			{% for year in range(2016, 2018) %}
+				<option{% if destination.year == year|string %} selected="selected"{% endif %}>{{year}}</option>
+			{% endfor %}
+		</select>
+		{% if 'missing-year' in destination.errors %}
+			<span class="error">Missing year</span>
+		{% endif %}
+	</div>
+	<div>
+		{% if destination.id %}
+			<input type="hidden" name="id" value="{{destination.id}}" />
+		{% endif %}
+		<input type="hidden" name="user_id" value="{{user_id}}" />
+		<button>Save</button>
+	</div>
+</form>
+<script type="text/javascript">
+	{% if 'missing-did' in destination.errors %}
+		document.forms[0].did.focus();
+	{% elif 'missing-number' in destination.errors %}
+		document.forms[0].number.focus();
+	{% elif 'missing-day' in destination.errors or 'invalid-date' in destination.errors %}
+		document.forms[0].day.focus();
+	{% elif 'missing-month' in destination.errors %}
+		document.forms[0].month.focus();
+	{% elif 'missing-year' in destination.errors %}
+		document.forms[0].year.focus();
+	{% else %}
+		document.forms[0].did.focus();
+	{% endif %}
+</script>
+{% endblock %}

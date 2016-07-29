@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Calls - Switch{% endblock %}
+{% block content %}
+<h1>Calls</h1>
+<table>
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>Source</th>
+			<th>Destination</th>
+			<th>Status</th>
+			<th>Duration</th>
+			<th>Recording</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for call in calls %}
+			<tr>
+				<td>{{call.date|humandate}} {{call.date|humantime}}</td>
+				<td>{{call.source}}</td>
+				<td>{{call.destination}}</td>
+				<td>{{call.status or ''}}</td>
+				<td>{% if call.duration %}{{call.duration|pretty_duration}}{% endif %}</td>
+				<td>
+					{% if call.has_recording %}
+						<a href="/monitor/{{call.id}}.mp3">mp3</a>
+						<a href="/delete-recording?id={{call.id}}&url=/customers/{{call.user_id}}/calls/{{call.date.year}}/{{call.date.month}}">delete</a>
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "dash.html" %}
+{% block title %}Customers - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
+{% block content %}
+<h3>Create customer</h3>
+<p></p>
+<form action="/customers/create" method="post">
+	<div>
+		<label for="first_name">First Name</label>
+		<input id="first_name" type="text" name="firstname" value="" />
+		
+	</div>
+	<div>
+		<label for="last_name">Last Name</label>
+		<input id="last_name" type="text" name="lastname" value="" />
+		
+	</div>
+	<div>
+		<label for="number">Phone (Origin)</label>
+		<input id="number" type="tel" name="number" value="" />
+		
+	</div>
+	<div>
+		<label for="email">Email</label>
+		<input id="email" type="email" name="email_cust" value="" />
+		
+	</div>
+
+	<div>
+		<button>Create customer</button>
+	</div>
+</form>
+
+<strong>{% if error != None %} {{error}} {% endif %}</strong>
+{% endblock %}

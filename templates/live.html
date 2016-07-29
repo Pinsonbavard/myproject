@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Calls - Switch{% endblock %}
+{% block content %}
+<h1>Calls</h1>
+<div id="calls"></div>
+<script type="text/javascript">
+function getdata() {
+	$.ajax({
+		url: '/live-calls?t=' + new Date().getTime(),
+		dataType: 'json',
+		success: function(data) {
+			s = '<table>';
+			s += '<th colspan="2">Customer</th>';
+			s += '<th>Channel</th>';
+			s += '<th>Caller ID</th>';
+			s += '<th>Context</th>';
+			s += '<th>Extension</th>';
+			s += '<th>Line</th>';
+			s += '<th>Duration</th>';
+			s += '<th>Status</th>';
+			for (i = 0; i < data.length; i++) {
+				call = data[i];
+				s += '<tr>';
+				if (call.user_id) {
+					s += '<td>' + call.first_name + '</td>';
+					s += '<td>' + call.last_name + '</td>';
+				} else {
+					s += '<td></td>';
+					s += '<td></td>';
+				}
+				s += '<td>' + call.channel + '</td>';
+				s += '<td>' + call.caller_id + '</td>';
+				s += '<td>' + call.context + '</td>';
+				s += '<td>' + call.extension + '</td>';
+				s += '<td>' + call.line + '</td>';
+				s += '<td>' + call.duration + '</td>';
+				s += '<td>' + call.channel_state + '</td>';
+				s += '</tr>';
+			}
+			s += '</table>';
+			$('#calls').html(s);
+			setTimeout(getdata, 1000);
+		}
+	});
+}
+setTimeout(getdata, 0);
+
+</script>
+{% endblock %}

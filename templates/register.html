@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Register - Switch{% endblock %}
+{% block content %}
+
+<h1>Register</h1>
+<form action="/register" method="post">
+	
+	<div>
+		<label for="auth_did">Firstname</label>
+		<input type="text" id="auth_did" name="firstname"/>
+	</div>
+	<div>
+		<label for="auth_gw">Lastname</label>
+		<input type="text" id="auth_gw" name="lastname"/>
+	</div>
+	<div>
+		<label for="gateway">Email</label>
+		<input id="gateway" name="email"/>
+	</div>
+	<div>
+		<label for="channel">Number</label>
+		<input id="channel" name="number"/>
+	</div>
+		<button>Register</button>
+	</div>
+</form>
+
+{% if error != None %} {{error}} {% endif %}
+
+{% endblock %}
+
+<link rel="stylesheet" type="text/css" href="/static/styles.css">
+		<link rel="stylesheet" type="text/css" href="/static/font-awesome.css">

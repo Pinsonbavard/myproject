@@ -1,0 +1,41 @@
+{% extends "dash.html" %}
+{% block title %}PIN - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
+{% block content %}
+	
+	<p></p>
+	<form action="/pin" method="POST">
+	
+		<button>Click to generate (50) pins</button>
+	
+</form>
+
+
+<strong>{% if error != None %} {{error}} {% endif %}</strong>
+
+<p></p>
+<hr/>
+<table class="table">
+	<tr>
+		<th>ID</th>
+		<th>Pin</th>
+		<th>Created by</th>
+		<th>Created date</th>
+		<th>Mode</th>
+	</tr>
+	{% for pin in pins%}
+	<tr>
+		<td>{{pin.id}}</td>
+		<td><strong>{{pin.pin}}</strong></td>
+		<td>{{pin.created_by | User }}</td>
+		<td>{{pin.created_date | humandatetime | safe}}</td>
+		<td>{{pin.mode}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}
+
+
+
+

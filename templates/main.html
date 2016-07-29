@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Home - Switch{% endblock %}
+{% block content %}
+	<div id="header">
+		<a href="/login"><strong>Login</strong></a>
+		<a href="/register"><strong>Register</strong></a>
+	</div>
+	<p></p>
+	<p> Server disk space: <strong>{{disk}}</strong></p>
+	<p>Date : <strong>{{date}}</strong></p>
+	<p>Hour (UTC) : <strong>{{hourUTC}}</strong></p>
+	<p>Hour (localtime) : <strong>{{localTime}}</strong></p>
+	<p></p>
+	<p>Hour comparison (/hr) : <strong>{{hourdiff}}hr</strong></p>
+
+{% endblock %}
+
+

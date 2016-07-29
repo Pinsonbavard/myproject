@@ -1,0 +1,45 @@
+{% extends "dash.html" %}
+{% block title %}IP filters - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
+{% block content %}
+	
+	
+<p></p>
+<table>
+	<tr>
+		<th>IP address</th>
+		<th>Command</th>
+		<th>Country code</th>
+		<th>country</th>
+		<th>City</th>
+		<th>Region</th>
+		<th>continent</th>
+		<th>timezone</th>
+		<th>sub-divisions</th>
+		<th>type</th>
+		<th>interface</th>
+		<th>Created by</th>
+		<th>created date</th>
+	</tr>
+	{% for ipfilter in ipfilters%}
+	<tr>
+		<td>{{ipfilter.ip}}</td>
+		<td>{{ipfilter.target}}</td>
+		<td>{{ipfilter.ip | IpCountryCode | safe}}</td>
+		<td>{{ipfilter.ip | IpCountry | safe}}</td>
+		<td>{{ipfilter.ip | IpCity | safe}}</td>
+		<td>{{ipfilter.ip | IpRegion | safe}}</td>
+		<td>{{ipfilter.ip | IpContinent | safe}}</td>
+		<td>{{ipfilter.ip | Iptimezone | safe}}</td>
+		<td>{{ipfilter.ip | Ipsubdivisions | safe}}</td>
+		<td>{{ipfilter.mode_type}}</td>
+		<td>{{ipfilter.interface}}</td>
+		<td>SYSTEM</td>
+		<td>{{ipfilter.created_date | humandatetime | safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}
+
+
+

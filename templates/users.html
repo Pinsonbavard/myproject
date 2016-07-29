@@ -1,0 +1,68 @@
+{% extends "dash.html" %}
+{% block title %}Customers - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
+{% block content %}
+<h1>Customers</h1>
+<a href="/customers/create">new</a>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Origin</th>
+			<th>Destination</th>
+			<th>DID</th>
+			<th>Own</th>
+			<th>Initial date</th>
+			<th>End date</th>
+			<th>Gateway</th>
+			<th>Channel</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for customer in customers %}
+			<tr>
+				<td><a href="/customers/{{customer.id}}">{{customer.first_name}} {{customer.last_name}}</a></td>
+				<td>{{customer.number}}</td>
+				<td>
+					{% for destination in customer.destinations %}
+						{{destination.number}}<br />
+					{% endfor %}
+				</td>
+				<td>
+					{% for destination in customer.destinations %}
+						{{destination.did}}<br />
+					{% endfor %}
+				</td>
+				<td>
+					{% for destination in customer.destinations %}
+						{{destination.own}}<br />
+					{% endfor %}
+				</td>
+				<td>
+					
+					{% for destination in customer.destinations %}
+						{{destination.created_date|humandatetime|safe}}<br />
+					{% endfor %}
+				</td>
+				<td>
+					
+					{% for destination in customer.destinations %}
+						{% if destination.expire_date %}{{destination.expire_date|humandatetime|safe}}{% endif %}<br />
+					{% endfor %}
+				</td>
+				<td>
+					
+					{% for destination in customer.destinations %}
+						{{destination.gateway or ''}}<br />
+					{% endfor %}
+				</td>
+				<td>
+					{% for destination in customer.destinations %}
+						{{destination.channel or ''}}<br />
+					{% endfor %}
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
