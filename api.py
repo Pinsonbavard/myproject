@@ -240,7 +240,7 @@ def Login():
                 flash("Logged In")
                 session['username'] = email
                 login_user = System().getUser(session.get('username'))
-                return redirect(url_for('Home'))
+                return redirect('/home')
             error = 'Invalid login credentials'
             return render_template('login.html', error=error)
         return render_template('login.html')
