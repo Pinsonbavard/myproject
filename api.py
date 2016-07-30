@@ -214,7 +214,7 @@ def Register():
                     thr.start()
                     flash("Logged In")
                     login_user = system.getUser(session.get('username'))
-                    return redirect(url_for('Home'))
+                    return redirect(url_for('Home', ses=session.get('username')))
         return render_template('register.html', error=error)
     system = System()
     login_user = system.getUser(session.get('username'))
@@ -240,7 +240,7 @@ def Login():
                 flash("Logged In")
                 session['username'] = email
                 login_user = System().getUser(session.get('username'))
-                return redirect(url_for('Home'))
+                return redirect(url_for('Home', ses=session.get('username')))
             error = 'Invalid login credentials'
             return render_template('login.html', error=error)
         return render_template('login.html')
@@ -389,7 +389,7 @@ def destination_new(user_id):
     return redirect('/')
 
 
-@app.route("/home")
+@app.route("/home/<ses>")
 def Home():
 
     if session.get('username'):
