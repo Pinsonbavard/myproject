@@ -390,7 +390,7 @@ def destination_new(user_id):
 
 
 @app.route("/home/<ses>")
-def Home():
+def Home(ses):
 
     if session.get('username'):
 
@@ -398,7 +398,7 @@ def Home():
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
         system.defaultAction()
-        login_user = system.getUser(session.get('username'))
+        login_user = system.getUser(ses)
         return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))
 
