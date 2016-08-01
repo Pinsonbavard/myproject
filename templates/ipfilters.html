@@ -5,6 +5,7 @@
 	
 	
 <p></p>
+<div>Your IP is {{ip}}</div>
 <table>
 	<tr>
 		<th>IP address</th>
@@ -36,6 +37,7 @@
 		<td>{{ipfilter.interface}}</td>
 		<td>SYSTEM</td>
 		<td>{{ipfilter.created_date | humandatetime | safe}}</td>
+		<td><input type="checkbox" name="filterip"></td>
 	</tr>
 	{% endfor %}
 </table>

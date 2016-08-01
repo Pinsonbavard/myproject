@@ -23,100 +23,10 @@ from time import strftime, gmtime, localtime
 import os
 #from path import path
 from werkzeug import secure_filename
-from socket import gethostname, gethostbyname
 import iptc
+from geoip import geolite2
+import requests
 
-def dropAllInbound():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-    rule = iptc.Rule()
-    rule.in_interface = 'eth+'
-    rule.target = iptc.Target(rule, 'DROP')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"DROP")
-
-def allowLoopback():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-    rule = iptc.Rule()
-    rule.in_interface = 'lo'
-    rule.target = iptc.Target(rule, 'ACCEPT')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"ACCEPT")
-
-def allowEstablishedInbound():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-    rule = iptc.Rule()
-    match = rule.create_match('state')
-    match.state = 'RELATED,ESTABLISHED'
-    rule.target = iptc.Target(rule, 'ACCEPT')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"ACCEPT")
-
-def allowHTTP():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-    rule = iptc.Rule()
-    rule.in_interface = 'eth+'
-    rule.protocol = 'tcp'
-    match = rule.create_match('tcp')
-    match.dport = '80'
-    rule.target = iptc.Target(rule, 'ACCEPT')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"ACCEPT")
-
-def allowHTTPS():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-    rule = iptc.Rule()
-    rule.in_interface = 'eth+'
-    rule.protocol = 'tcp'
-    match = rule.create_match('tcp')
-    match.dport = '443'
-    rule.target = iptc.Target(rule, 'ACCEPT')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"ACCEPT")
-
-def allowSSH():
-
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-    rule = iptc.Rule()
-    rule.in_interface = 'eth+'
-    rule.protocol = 'tcp'
-    match = rule.create_match('tcp')
-    match.dport = '22'
-    rule.target = iptc.Target(rule, 'ACCEPT')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"ACCEPT")
-
-def allowEstablishedOutbound():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
-    rule = iptc.Rule()
-    match = rule.create_match('state')
-    match.state = 'RELATED,ESTABLISHED'
-    rule.target = iptc.Target(rule, 'ACCEPT')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"ACCEPT")
-
-def dropAllOutbound():
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
-    rule = iptc.Rule()
-    rule.in_interface = 'eth+'
-    rule.target = iptc.Target(rule, 'DROP')
-    chain.insert_rule(rule)
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-    System().insertIp(ip,"DROP")
-
-def defaultAction():
-    
-    dropAllOutbound()
-    dropAllInbound()
-    allowLoopback()
-    allowEstablishedInbound()
-    allowEstablishedOutbound()
 
     
 
@@ -135,7 +45,7 @@ def ensure_dir(d):
 
 app.config['SQLALCHEMY_POOL_SIZE'] = 100
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
-app.config['UPLOAD_FOLDER'] = 'C:/Users/pinso/Desktop/uploads/'
+app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config["MAIL_SERVER"] = "smtp.pepipost.com"
 app.config["MAIL_PORT"] = 25
 #app.config["MAIL_USE_TLS"] = True
@@ -166,6 +76,79 @@ def _jinja2_filter_user(id):
     if user is None:
         return "SYSTEM"
     return user.first_name + ' '+ user.last_name
+
+
+@app.template_filter('IpCountryCode')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match is None:
+        return "Not found"
+    return match['country_code']
+
+@app.template_filter('IpCountry')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match is None:
+        return "Not found"
+    return match['country_name']
+
+
+@app.template_filter('IpCity')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match['city'] is None:
+        return "Not found"
+    return match['city']
+
+
+@app.template_filter('IpRegion')
+def _jinja2_filter_user(ip):
+
+    #match = geolite2.lookup(ip)
+    url = 'http://freegeoip.net/json/'+ip
+    match = requests.get(url)
+    match = match.json()
+    if match['region_name'] is None:
+        return "Not found"
+    return match['region_name']
+
+@app.template_filter('IpContinent')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.continent
+
+@app.template_filter('Iptimezone')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.timezone
+
+
+@app.template_filter('Ipsubdivisions')
+def _jinja2_filter_user(ip):
+
+    match = geolite2.lookup(ip)
+    if match is None:
+        return "Not found"
+    return match.subdivisions
+
 
 @app.template_filter('DestinationUserId')
 def _jinja2_filter_destination(did):
@@ -231,7 +214,7 @@ def Register():
                     thr.start()
                     flash("Logged In")
                     login_user = system.getUser(session.get('username'))
-                    return redirect(url_for('Home', login_user=login_user))
+                    return redirect(url_for('Home'))
         return render_template('register.html', error=error)
     system = System()
     login_user = system.getUser(session.get('username'))
@@ -257,7 +240,7 @@ def Login():
                 flash("Logged In")
                 session['username'] = email
                 login_user = System().getUser(session.get('username'))
-                return redirect(url_for('Home', login_user=login_user))
+                return redirect('/home')
             error = 'Invalid login credentials'
             return render_template('login.html', error=error)
         return render_template('login.html')
@@ -414,9 +397,22 @@ def Home():
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
+        system.defaultAction()
         login_user = system.getUser(session.get('username'))
-        defaultAction()
         return render_template('home.html', login_user=login_user, ip=ip)
+    return redirect(url_for("Index"))
+
+
+@app.route("/ipfilters")
+def Ipfilters():
+
+    if session.get('username'):
+
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
+        system = System()
+        ipfilters = system.ipfilters()
+        login_user = system.getUser(session.get('username'))
+        return render_template('ipfilters.html', login_user=login_user, ip=ip, ipfilters=ipfilters)
     return redirect(url_for("Index"))
 
 
@@ -536,10 +532,11 @@ def Own():
                     #fileUrl = path(app.config['UPLOAD_FOLDER']+filename).abspath()
 
                     error = 'File uploaded : Path -> ' + fileUrl
-                    data_list_owns = System().readCSV(fileUrl)
-                    insert_owns = System().insertOwns(data_list_owns)
+                    data_list_owns = system.readCSV(fileUrl)
+                    insert_owns = system.insertOwns(data_list_owns)
 
                     error =  str(insert_owns) + ' OWN has been uploaded and saved'
+                    #error =  data_list_owns
 
                 except:
 
@@ -679,3 +676,15 @@ def send_async_email_test(app,msg):
     
         
     
+    
+if __name__ == "__main__":
+    
+    
+    
+    ##db.session.rollback() 
+    #db.session.commit()
+    #app.run(debug=True,port=90)
+    #app.run()
+    #system = System()
+    #system.defaultAction()
+    app.run(host='0.0.0.0')

@@ -23,9 +23,10 @@ from time import strftime, gmtime, localtime
 import os
 #from path import path
 from werkzeug import secure_filename
-import iptc
+#import iptc
 from geoip import geolite2
 import requests
+from socket import gethostname, gethostbyname 
 
 
     
@@ -224,7 +225,7 @@ def Register():
 @app.route("/login", methods=['GET', 'POST'])
 def Login():    
 
-    if not session.get('username'):
+    if not 'username' in session:
 
         if request.method == 'POST':
 
@@ -251,7 +252,7 @@ def Login():
 @app.route('/customers')
 def users():
 
-    if session.get('username'):
+    if 'username' in session:
         system = System()
         login_user = system.getUser(session.get('username'))
         customers = system.customers()
@@ -262,7 +263,7 @@ def users():
 def user_create():
 
     
-    if session.get('username'):
+    if 'username' in session:
         system = System()
         login_user = system.getUser(session.get('username'))
         error = None
@@ -307,7 +308,7 @@ def user_create():
 @app.route('/customers/<int:user_id>')
 def user(user_id=None):
 
-    if session.get('username'):
+    if 'username' in session:
         system = System()
         login_user = system.getUser(session.get('username'))
         user = system.getUserById(user_id)
@@ -321,7 +322,7 @@ def user(user_id=None):
 @app.route('/customers/edit')
 def user_edit(user_id=None):
 
-    if session.get('username'):
+    if 'username' in session:
 
         system = System()
         login_user = system.getUser(session.get('username'))
@@ -350,7 +351,7 @@ def user_edit(user_id=None):
 @app.route('/customers/<int:user_id>/destinations', methods=['GET','POST'])
 def destination_new(user_id):
 
-    if session.get('username'):
+    if 'username' in session:
 
         system = System()
         dids = system.available_dids()
@@ -392,12 +393,12 @@ def destination_new(user_id):
 @app.route("/home")
 def Home():
 
-    if session.get('username'):
+    if 'username' in session:
 
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
-        system.defaultAction()
+        #system.defaultAction()
         login_user = system.getUser(session.get('username'))
         return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))
@@ -406,7 +407,7 @@ def Home():
 @app.route("/ipfilters")
 def Ipfilters():
 
-    if session.get('username'):
+    if 'username' in session:
 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
@@ -420,7 +421,7 @@ def Ipfilters():
 def Pin():
 
 
-    if session.get('username'):
+    if 'username' in session:
 
         system = System()
         pins = system.pins()
@@ -449,7 +450,7 @@ def Pin():
 
 @app.route("/countries", methods=['POST','GET'])
 def countries():
-    if session.get('username'):
+    if 'username' in session:
 
         system = System()
         countries = system.countries()
@@ -485,7 +486,7 @@ def countries():
 def Own():
 
 
-    if session.get('username'):
+    if 'username' in session:
 
         system = System()
         login_user = system.getUser(session.get('username'))
@@ -560,7 +561,7 @@ def Own():
 def Did():
 
 
-    if session.get('username'):
+    if 'username' in session:
 
 
 
@@ -662,7 +663,7 @@ def Did():
 def Logout():
 
     ## REMOVE THE username SESSION
-    session.clear()
+    session.pop('username',None)
     return redirect(url_for('Index'))
 
 

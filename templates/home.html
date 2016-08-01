@@ -3,6 +3,6 @@
 {% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
 <div class="content">
 	{% block content %}
-	    {{ip}}
+	    Your IP address is {{ip}} and you are login in from {{ip | IpCity | safe}} somewhere around  {{ip | IpCountry | safe}}
 	{% endblock %}
 </div>
