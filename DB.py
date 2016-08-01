@@ -99,13 +99,12 @@ class Ipfilters(db.Model):
     interface = db.Column(db.String(10), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
 
-    def __init__(self,ip,target, mode_type, interface, location=None):
+    def __init__(self,ip,target, mode_type, interface):
 
         self.ip = ip
         self.target = target
         self.mode_type = mode_type
         self.interface = interface
-        self.location = location
 
     
 
