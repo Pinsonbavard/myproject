@@ -202,16 +202,7 @@ class System():
 
     def dropAllInbound(self):
 
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'eth+'
-        #rule.target = iptc.Target(rule, 'DROP')
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"DROP","dropAllInbound","eth+")
-        db.session.add(iprecord)
-        db.session.commit()
+        
         return 0
 
     def allowLoopback(self):
