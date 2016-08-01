@@ -14,7 +14,7 @@ MySQL-python==1.2.5
 python-dateutil==2.4.2
 python-mimeparse==1.5.1
 requests==2.9.1
-SQLAlchemy
+SQLAlchemy==1.0.12
 Werkzeug==0.11.3
 virtualenv==1.11.6
 wheel==0.26.0
@@ -22,5 +22,5 @@ sendgrid==1.6.22
 werkzeug==0.11.3
 psutil==4.3.0
 python-iptables==0.11.0
-python-geopip
-python-geoip-geolite2
+python-geopip==1.2
+python-geoip-geolite2==2015.303
