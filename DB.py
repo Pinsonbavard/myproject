@@ -208,8 +208,11 @@ class System():
         #rule.target = iptc.Target(rule, 'DROP')
         rule.target = iptc.Target(rule, 'ACCEPT')
         chain.insert_rule(rule)
-        
-        return 0
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"DROP","dropAllInbound","eth+")
+        db.session.add(iprecord)
+        db.session.commit()
+
 
     def allowLoopback(self):
 
