@@ -23,7 +23,7 @@ from time import strftime, gmtime, localtime
 import os
 #from path import path
 from werkzeug import secure_filename
-#import iptc
+import iptc
 from geoip import geolite2
 import requests
 from socket import gethostname, gethostbyname 
@@ -36,7 +36,7 @@ from socket import gethostname, gethostbyname
 #e = create_engine("mysql://firsvat:Firsvat@2016@98.102.204.204:3306/firsvat", pool_recycle=3600)
 
 app = Flask(__name__)
-app.secret_key = "moyinoluwa1999"
+app.secret_key = "tPG9DAaaAd"
 
 def ensure_dir(d):
 
@@ -398,7 +398,7 @@ def Home():
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
-        #system.defaultAction()
+        system.defaultAction()
         login_user = system.getUser(session.get('username'))
         return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))

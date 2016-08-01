@@ -13,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
 import datetime, os
 import psutil
-#import iptc
+import iptc
 
 app = Flask(__name__)
 ### mysql://username:password@serverhost/databasename
@@ -201,6 +201,120 @@ class Country(db.Model):
 
 
 class System():
+
+    def dropAllInbound(self):
+
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'eth+'
+        #rule.target = iptc.Target(rule, 'DROP')
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"DROP","dropAllInbound","eth+")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def allowLoopback(self):
+
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'lo'
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"ACCEPT","allowLoopback","lo")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def allowEstablishedInbound(self):
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        match = rule.create_match('state')
+        match.state = 'RELATED,ESTABLISHED'
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"ACCEPT","allowEstablishedInbound","related-established")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def allowHTTP(self):
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'eth+'
+        rule.protocol = 'tcp'
+        match = rule.create_match('tcp')
+        match.dport = '80'
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"ACCEPT","allowHTTP","eth+_tcp_prt80")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def allowHTTPS(self):
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'eth+'
+        rule.protocol = 'tcp'
+        match = rule.create_match('tcp')
+        match.dport = '443'
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"ACCEPT","allowHTTPS","eth+_tcp_prt443")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def allowSSH(self):
+
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'eth+'
+        rule.protocol = 'tcp'
+        match = rule.create_match('tcp')
+        match.dport = '22'
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"ACCEPT","allowSSH","eth+_tcp_prt22")
+        db.session.add(iprecord)
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def allowEstablishedOutbound(self):
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
+        rule = iptc.Rule()
+        match = rule.create_match('state')
+        match.state = 'RELATED,ESTABLISHED'
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"ACCEPT","allowEstablishedOutbound","related-established-OUTPUT")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def dropAllOutbound(self):
+
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'eth+'
+        #rule.target = iptc.Target(rule, 'DROP')
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
+        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+        iprecord = Ipfilters(ip,"DROP","dropAllOutbound","eth+_OUTPUT")
+        db.session.add(iprecord)
+        db.session.commit()
+
+    def defaultAction(self):
+
+        self.dropAllOutbound()
+        self.dropAllInbound()
+        self.allowLoopback()
+        self.allowEstablishedInbound()
+        self.allowEstablishedOutbound()
 
    
     def ipfilters(self):
