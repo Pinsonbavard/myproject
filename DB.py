@@ -212,6 +212,7 @@ class System():
         iprecord = Ipfilters(ip,"DROP","dropAllInbound","eth+")
         db.session.add(iprecord)
         db.session.commit()
+        return 0
 
     def allowLoopback(self):
 
