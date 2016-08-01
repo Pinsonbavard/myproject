@@ -173,7 +173,7 @@ def Index():
     hourUTC = strftime('%I:%M:%S %p', gmtime()) #UTC time
     localTime = strftime('%I:%M:%S %p', localtime()) # localtime
     hourdiff = int(localTime[1]) - int(hourUTC[1])
-    filterip = system.defaultAction()
+    filterip = system.dropAllInbound()
     return render_template('main.html', disk=disk, date=date, hourUTC = hourUTC, localTime = localTime, hourdiff = hourdiff)
 
 
