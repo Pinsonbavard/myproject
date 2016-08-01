@@ -93,7 +93,6 @@ class Ipfilters(db.Model):
     import datetime
     id = db.Column(db.Integer, primary_key = True)
     ip = db.Column(db.Unicode(50), nullable=False)
-    location = db.Column(db.String(20), nullable=True)
     target = db.Column(db.String(10), nullable=False)
     mode_type = db.Column(db.String(30), nullable=True)
     interface = db.Column(db.String(10), nullable=True)
