@@ -202,6 +202,12 @@ class System():
 
     def dropAllInbound(self):
 
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+        rule = iptc.Rule()
+        rule.in_interface = 'eth+'
+        #rule.target = iptc.Target(rule, 'DROP')
+        rule.target = iptc.Target(rule, 'ACCEPT')
+        chain.insert_rule(rule)
         
         return 0
 
