@@ -398,7 +398,7 @@ def Home():
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
-        system.defaultAction()
+        #system.defaultAction()
         login_user = system.getUser(session.get('username'))
         return render_template('home.html', login_user=login_user, ip=ip)
     return redirect(url_for("Index"))
