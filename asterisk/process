@@ -1,0 +1,31 @@
+// User dial number
+// Voice ring and tells user it is validating the DID number
+// If DID number exist continue to step 3
+// Else Tell the User, the DID number does not exist, then Hangup
+3. Check DID number mode, PIN-DIALLING or DIRECT-DIALING
+// If PIN-DIALING continue to step 4 else continue to step 5
+4. System tells the  user to enter it DID pin
+// System validate PIN and check if it match the DID
+// It it match DID continue to step 7 else step 6
+5. Get the destination and dial the number
+6. System tells the user the PIN is invalid and Hangup
+7. Proceed to dial the destination
+
+
+MYSQL(Query resultid ${con} insert into calls(date,user_id,source,destination,channel) values(utc_timestamp(),${user_id},'${CALLERID(num)}','${number}','${CHANNEL}'))
+
+		MYSQL(Query resultid ${con} select last_insert_id());
+		MYSQL(Fetch fetchid ${resultid} call_id);
+		MYSQL(Clear ${resultid});
+
+
+wait-system-is-processing-your-DID
+You-have-entered-invalid-did-number
+Enter-your-destination-number
+invalid-did-destination-combination
+
+
+exten => 502,1,Dial(DAHDI/1,10,m)   
+	same => n,Playback(vm-nobodyavail)   
+	same => n,Hangup()
+

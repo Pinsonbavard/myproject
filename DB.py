@@ -345,7 +345,9 @@ class System():
 
     def dids(self):
 
+        db.session.commit()
         dids = Did.query.all()
+        db.session.close()
         return dids
 
     def available_dids(self):
