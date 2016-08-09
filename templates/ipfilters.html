@@ -8,7 +8,7 @@
 <div>Your IP is {{ip}}</div>
 <div class="action-btns" style="display:none">
 	<button class="actbtn" id="authorize">Authorize</button>
-	<button class="actbtn" id="unathorize">Unauthorize</button>
+	<button class="actbtn" id="unauthorize">Unauthorize</button>
 </div>
 <p></p>
 <table>
@@ -28,7 +28,7 @@
 		<th>created date</th>
 	</tr>
 	{% for ipfilter in ipfilters%}
-	<tr>
+	<tr id="iprow{{ipfilter.id}}">
 		<td>{{ipfilter.ip}}</td>
 		<td>{{ipfilter.target}}</td>
 		<td>{{ipfilter.ip | IpCountryCode | safe}}</td>
@@ -43,6 +43,8 @@
 		<td>SYSTEM</td>
 		<td>{{ipfilter.created_date | humandatetime | safe}}</td>
 		<td><input type="checkbox" name="filterip"></td>
+		<td><input type="hidden" value="{{ipfilter.ip}}"></td>
+		<td><a id="{{ipfilter.id}}" class="ip-delete-icon">delete</a></td>
 	</tr>
 	{% endfor %}
 </table>

@@ -47,14 +47,17 @@
 		<th>Created date</th>
 	</tr>
 	{% for country in countries%}
-	<tr>
+	<tr id="row{{country.id}}">
 		<td>{{country.country}}</td>
 		<td>{{country.region}}</td>
 		<td>{{country.created_by | User }}</td>
 		<td>{{country.created_date | humandatetime | safe}}</td>
+		<td><input type="hidden" id="txtbox{{country.id}}" value="{{country.country}}"></td>
+		<td><a id="{{country.id}}" class="country-delete-icon">delete</a></td>
 	</tr>
 	{% endfor %}
 </table>
+
 
 {% endblock %}
 

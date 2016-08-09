@@ -24,12 +24,14 @@
 		<th>Mode</th>
 	</tr>
 	{% for pin in pins%}
-	<tr>
+	<tr id="pinrow{{pin.id}}">
 		<td>{{pin.id}}</td>
 		<td><strong>{{pin.pin}}</strong></td>
 		<td>{{pin.created_by | User }}</td>
 		<td>{{pin.created_date | humandatetime | safe}}</td>
 		<td>{{pin.mode}}</td>
+		<td><input type="hidden" value="{{pin.pin}}"></td>
+		<td><a id="{{pin.id}}" class="pin-delete-icon">delete</a></td>
 	</tr>
 	{% endfor %}
 </table>

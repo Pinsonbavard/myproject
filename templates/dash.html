@@ -7,7 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="/static/font-awesome.css">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script type="text/javascript">
-			$(document).ready(function(){
+		$(document).ready(function(){
 
 		    $("tr:even").css("background-color","silver");
 		    // rgba equivalent for yellow with 50% opacity
@@ -29,7 +29,185 @@
 		    	}
 		    	alert(msg)
 		    })
+
+		   $('a.country-delete-icon').click(function(item){
+
+		   		var id = this.id
+		   		var row = $('#row'+id+' input[type=hidden]')
+		   		var get_val = row.val()
+		   		var choice = confirm("Are you sure you want to delete "+get_val)
+		   		if(choice == true){
+
+		   			$.ajax({
+		   				url:'/countries/delete/'+id,
+		   				dataType: 'json',
+		   				success: function(data){
+		   					if(data.success == 0){
+
+		   						alert("You deleted "+get_val)
+		   						var row = $('#row'+id).hide()
+		   					}
+		   					else{
+		   						alert("You didnt delete "+get_val)
+		   					}
+		   				}
+		   			})
+		   		}
+		   		else{
+
+		   		}
+
+		   })
+
+		    $('a.pin-delete-icon').click(function(item){
+
+		   		var id = this.id
+		   		var row = $('#pinrow'+id+' input[type=hidden]')
+		   		var get_val = row.val()
+		   		var choice = confirm("Are you sure you want to delete "+get_val)
+		   		if(choice == true){
+
+		   			$.ajax({
+		   				url:'/pins/delete/'+id,
+		   				dataType: 'json',
+		   				success: function(data){
+		   					if(data.success == 0){
+
+		   						alert("You deleted "+get_val)
+		   						var row = $('#pinrow'+id).hide()
+		   					}
+		   					else{
+		   						alert("You didnt delete "+get_val)
+		   					}
+		   				}
+		   			})
+		   		}
+		   		else{
+
+		   		}
+
+		   })
+
+
+		   $('a.own-delete-icon').click(function(item){
+
+		   		var id = this.id
+		   		var row = $('#ownrow'+id+' input[type=hidden]')
+		   		var get_val = row.val()
+		   		var choice = confirm("Are you sure you want to delete "+get_val)
+		   		if(choice == true){
+
+		   			$.ajax({
+		   				url:'/owns/delete/'+id,
+		   				dataType: 'json',
+		   				success: function(data){
+		   					if(data.success == 0){
+
+		   						alert("You deleted "+get_val)
+		   						var row = $('#ownrow'+id).hide()
+		   					}
+		   					else{
+		   						alert("You didnt delete "+get_val)
+		   					}
+		   				}
+		   			})
+		   		}
+		   		else{
+
+		   		}
+
+		   })
+
+		   $('a.did-delete-icon').click(function(item){
+
+		   		var id = this.id
+		   		var row = $('#didrow'+id+' input[type=hidden]')
+		   		var get_val = row.val()
+		   		var choice = confirm("Are you sure you want to delete "+get_val)
+		   		if(choice == true){
+
+		   			$.ajax({
+		   				url:'/dids/delete/'+id,
+		   				dataType: 'json',
+		   				success: function(data){
+		   					if(data.success == 0){
+
+		   						alert("You deleted "+get_val)
+		   						var row = $('#didrow'+id).hide()
+		   					}
+		   					else{
+		   						alert("You didnt delete "+get_val)
+		   					}
+		   				}
+		   			})
+		   		}
+		   		else{
+
+		   		}
+
+		   })
+
+		   $('a.user-delete-icon').click(function(item){
+
+		   		var id = this.id
+		   		var row = $('#userrow'+id+' input[type=hidden]')
+		   		var get_val = row.val()
+		   		var choice = confirm("Are you sure you want to delete "+get_val)
+		   		if(choice == true){
+
+		   			$.ajax({
+		   				url:'/users/delete/'+id,
+		   				dataType: 'json',
+		   				success: function(data){
+		   					if(data.success == 0){
+
+		   						alert("You deleted "+get_val)
+		   						var row = $('#userrow'+id).hide()
+		   					}
+		   					else{
+		   						alert("You didnt delete "+get_val)
+		   					}
+		   				}
+		   			})
+		   		}
+		   		else{
+
+		   		}
+
+		   })
+
+		    $('a.ip-delete-icon').click(function(item){
+
+		   		var id = this.id
+		   		var row = $('#iprow'+id+' input[type=hidden]')
+		   		var get_val = row.val()
+		   		var choice = confirm("Are you sure you want to delete "+get_val)
+		   		if(choice == true){
+
+		   			$.ajax({
+		   				url:'/ips/delete/'+id,
+		   				dataType: 'json',
+		   				success: function(data){
+		   					if(data.success == 0){
+
+		   						alert("You deleted "+get_val)
+		   						var row = $('#iprow'+id).hide()
+		   					}
+		   					else{
+		   						alert("You didnt delete "+get_val)
+		   					}
+		   				}
+		   			})
+		   		}
+		   		else{
+
+		   		}
+
+		   })
+
 		});
+
+		
 </script>
 	</head>
 	<body>

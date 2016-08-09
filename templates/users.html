@@ -20,7 +20,7 @@
 	</thead>
 	<tbody>
 		{% for customer in customers %}
-			<tr>
+			<tr id="userrow{{customer.id}}">
 				<td><a href="/customers/{{customer.id}}">{{customer.first_name}} {{customer.last_name}}</a></td>
 				<td>{{customer.number}}</td>
 				<td>
@@ -61,6 +61,8 @@
 						{{destination.channel or ''}}<br />
 					{% endfor %}
 				</td>
+				<td><input type="hidden" value="{{customer.first_name}} {{customer.last_name}}"></td>
+				<td><a id="{{customer.id}}" class="user-delete-icon">delete</a></td>
 			</tr>
 		{% endfor %}
 	</tbody>

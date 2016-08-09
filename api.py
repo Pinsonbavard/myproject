@@ -448,6 +448,53 @@ def Pin():
     return redirect(url_for("Index"))
 
 
+@app.route("/countries/delete/<country_id>",methods=["GET"])
+def deleteCountry(country_id):
+    if request.method == 'GET':
+        system = System()
+        response = system.deleteCountry(country_id)
+        return jsonify({"success":response})
+
+
+
+@app.route("/pins/delete/<pin_id>",methods=["GET"])
+def deletePin(pin_id):
+    if request.method == 'GET':
+        system = System()
+        response = system.deletePin(pin_id)
+        return jsonify({"success":response})
+
+
+@app.route("/dids/delete/<did_id>",methods=["GET"])
+def deleteDid(did_id):
+    if request.method == 'GET':
+        system = System()
+        response = system.deleteDid(did_id)
+        return jsonify({"success":response})
+
+@app.route("/owns/delete/<own_id>",methods=["GET"])
+def deleteOwn(own_id):
+    if request.method == 'GET':
+        system = System()
+        response = system.deleteOwn(own_id)
+        return jsonify({"success":response})
+
+
+
+@app.route("/users/delete/<user_id>",methods=["GET"])
+def deleteUser(user_id):
+    if request.method == 'GET':
+        system = System()
+        response = system.deleteUser(user_id)
+        return jsonify({"success":response})
+
+@app.route("/ips/delete/<ip_id>",methods=["GET"])
+def deleteIp(ip_id):
+    if request.method == 'GET':
+        system = System()
+        response = system.deleteIp(ip_id)
+        return jsonify({"success":response})
+
 @app.route("/countries", methods=['POST','GET'])
 def countries():
     if 'username' in session:

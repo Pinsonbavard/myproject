@@ -315,7 +315,6 @@ class System():
         self.allowLoopback()
         self.allowEstablishedInbound()
         self.allowEstablishedOutbound()
-
    
     def ipfilters(self):
 
@@ -451,6 +450,63 @@ class System():
         
         #db.session.close()        
         return data_list_length
+
+    def deleteCountry(self,country_id):
+        country = Country.query.get(country_id)
+        db.session.delete(country)
+        try:
+            db.session.commit()
+            return 0
+        except:
+            return 1
+
+    def deletePin(self,pin_id):
+        pin = Pin.query.get(pin_id)
+        db.session.delete(pin)
+        try:
+            db.session.commit()
+            return 0
+        except:
+            return 1
+
+
+    def deleteDid(self,did_id):
+        did = Did.query.get(did_id)
+        db.session.delete(did)
+        try:
+            db.session.commit()
+            return 0
+        except:
+            return 1
+
+
+    def deleteOwn(self,own_id):
+        own = Own.query.get(own_id)
+        db.session.delete(own)
+        try:
+            db.session.commit()
+            return 0
+        except:
+            return 1
+
+    def deleteUser(self,user_id):
+        user = Users.query.get(user_id)
+        db.session.delete(user)
+        try:
+            db.session.commit()
+            return 0
+        except:
+            return 1
+
+
+    def deleteIp(self,ip_id):
+        ip = Ipfilters.query.get(ip_id)
+        db.session.delete(ip)
+        try:
+            db.session.commit()
+            return 0
+        except:
+            return 1
 
     def insertOwns(self,dataList):
         data_list_length = len(dataList)

@@ -95,7 +95,7 @@
 		<th>Available</th>
 	</tr>
 	{% for did in dids%}
-	<tr>
+	<tr id="didrow{{did.id}}">
 		<td>{{did.phone}}</td>
 		<td>{{did.provider}}</td>
 		<td>{{did.cost}}</td>
@@ -106,6 +106,8 @@
 		<td>{{did.created_date | humandatetime | safe}}</td>
 		<td>{{did.phone | DestinationUserId | User | safe}}</td>
 		<td>{{did.available}}</td>
+		<td><input type="hidden" value="{{did.phone}}"></td>
+		<td><a id="{{did.id}}" class="did-delete-icon">delete</a></td>
 	</tr>
 	{% endfor %}
 </table>

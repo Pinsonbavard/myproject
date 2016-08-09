@@ -49,11 +49,13 @@
 		<th>Created date</th>
 	</tr>
 	{% for own in owns%}
-	<tr>
+	<tr id="ownrow{{own.id}}">
 		<td>{{own.sim}}</td>
 		<td>{{own.did}}</td>
 		<td>{{own.created_by | User }}</td>
 		<td>{{own.created_date | humandatetime | safe}}</td>
+		<td><input type="hidden" value="{{own.sim}}"></td>
+		<td><a id="{{own.id}}" class="own-delete-icon">delete</a></td>
 	</tr>
 	{% endfor %}
 </table>
