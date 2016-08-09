@@ -200,6 +200,7 @@ class Country(db.Model):
 
 class System():
 
+
     def dropAllInbound(self):
 
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
@@ -345,9 +346,9 @@ class System():
 
     def dids(self):
 
-        db.session.commit()
+        #db.session.commit()
         dids = Did.query.all()
-        db.session.close()
+        #db.session.close()
         return dids
 
     def available_dids(self):

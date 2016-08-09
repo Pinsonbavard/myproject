@@ -21,7 +21,6 @@ from threading import Thread
 from sqlalchemy.orm import relationship, backref
 from time import strftime, gmtime, localtime
 import os
-#from path import path
 from werkzeug import secure_filename
 import iptc
 from geoip import geolite2
@@ -31,7 +30,7 @@ from socket import gethostname, gethostbyname
 
     
 
-#e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=280)
+e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", isolation_level="READ UNCOMMITTED", pool_recycle=280)
 
 #e = create_engine("mysql://firsvat:Firsvat@2016@98.102.204.204:3306/firsvat", pool_recycle=3600)
 
@@ -685,8 +684,8 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    #app.run(debug=True,port=90)
+    app.run(debug=True,port=90)
     #app.run()
     #system = System()
     #system.defaultAction()
-    app.run(host='0.0.0.0')
+    #app.run(host='0.0.0.0')
