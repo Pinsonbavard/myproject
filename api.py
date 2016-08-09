@@ -684,8 +684,8 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    app.run(debug=True,port=90)
+    #app.run(debug=True,port=90)
     #app.run()
     #system = System()
     #system.defaultAction()
-    #app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0')
