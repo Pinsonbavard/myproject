@@ -17,6 +17,18 @@
 
 		    	$('.action-btns').show()
 		    })
+
+		    $('.action-btns').click(function(){
+
+		    	if(this.id == 'authorize'){
+
+		    		msg = 'Authorize action has been made'
+		    	}
+		    	else{
+		    		msg = 'Unathorized action has been made'
+		    	}
+		    	alert(msg)
+		    })
 		});
 </script>
 	</head>
