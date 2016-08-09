@@ -11,9 +11,11 @@ Created on Sat Jul 16 01:04:58 2016
 from flask import Flask, jsonify,make_response, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
+from sqlalchemy.orm import sessionmaker
 import datetime, os
 import psutil
-import iptc
+from sqlalchemy import create_engine
+#import iptc
 
 app = Flask(__name__)
 ### mysql://username:password@serverhost/databasename
@@ -25,6 +27,15 @@ app.config["SQLALCHEMY_POOL_RECYCLE"] = 30
 app.config['ALLOWED_EXTENSIONS'] = set(['csv'])
 
 db = SQLAlchemy(app)
+
+#some_engine = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=280)
+
+
+# create a configured "Session" class
+#Session = sessionmaker(bind=some_engine)
+
+# create a Session
+#session = Session()
 
     
 
@@ -201,136 +212,23 @@ class Country(db.Model):
 class System():
 
 
-    def dropAllInbound(self):
 
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'eth+'
-        #rule.target = iptc.Target(rule, 'DROP')
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"DROP","dropAllInbound","eth+")
-        db.session.add(iprecord)
-        db.session.commit()
-
-
-    def allowLoopback(self):
-
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'lo'
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT","allowLoopback","lo")
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def allowEstablishedInbound(self):
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        match = rule.create_match('state')
-        match.state = 'RELATED,ESTABLISHED'
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT","allowEstablishedInbound","related-established")
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def allowHTTP(self):
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'eth+'
-        rule.protocol = 'tcp'
-        match = rule.create_match('tcp')
-        match.dport = '80'
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT","allowHTTP","eth+_tcp_prt80")
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def allowHTTPS(self):
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'eth+'
-        rule.protocol = 'tcp'
-        match = rule.create_match('tcp')
-        match.dport = '443'
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT","allowHTTPS","eth+_tcp_prt443")
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def allowSSH(self):
-
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'eth+'
-        rule.protocol = 'tcp'
-        match = rule.create_match('tcp')
-        match.dport = '22'
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT","allowSSH","eth+_tcp_prt22")
-        db.session.add(iprecord)
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def allowEstablishedOutbound(self):
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
-        rule = iptc.Rule()
-        match = rule.create_match('state')
-        match.state = 'RELATED,ESTABLISHED'
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"ACCEPT","allowEstablishedOutbound","related-established-OUTPUT")
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def dropAllOutbound(self):
-
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'OUTPUT')
-        rule = iptc.Rule()
-        rule.in_interface = 'eth+'
-        #rule.target = iptc.Target(rule, 'DROP')
-        rule.target = iptc.Target(rule, 'ACCEPT')
-        chain.insert_rule(rule)
-        ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
-        iprecord = Ipfilters(ip,"DROP","dropAllOutbound","eth+_OUTPUT")
-        db.session.add(iprecord)
-        db.session.commit()
-
-    def defaultAction(self):
-
-        self.dropAllOutbound()
-        self.dropAllInbound()
-        self.allowLoopback()
-        self.allowEstablishedInbound()
-        self.allowEstablishedOutbound()
    
     def ipfilters(self):
 
-        ipfilterslist = Ipfilters.query.all()
+        ipfilterslist = db.session.query(Ipfilters).all()
         return ipfilterslist
 
     
     def getUser(self,email):
 
-        user = Users.query.filter_by(email=email).first()
+        user = db.session.query(Users).filter_by(email=email).first()
         return user
 
 
     def getUserById(self,id):
 
-        user = Users.query.filter_by(id=id).first()
+        user = db.session.query(Users).filter_by(id=id).first()
         return user
 
     def getDestinationByDid(self,did):
@@ -346,8 +244,8 @@ class System():
     def dids(self):
 
         #db.session.commit()
-        dids = Did.query.all()
-        #db.session.close()
+        dids = db.session.query(Did).all()
+        #
         return dids
 
     def available_dids(self):
@@ -362,7 +260,7 @@ class System():
 
     def owns(self):
 
-        owns = Own.query.all()
+        owns = db.session.query(Own).all()
         return owns
 
     def customers(self):
@@ -378,7 +276,8 @@ class System():
 
     def countries(self):
 
-        countries = Country.query.all()
+        countries = db.session.query(Country).all()
+
         return countries
 
     def disk_usage(self):
@@ -448,64 +347,76 @@ class System():
             db.session.commit()
 
         
-        #db.session.close()        
+        #        
         return data_list_length
 
     def deleteCountry(self,country_id):
-        country = Country.query.get(country_id)
-        db.session.delete(country)
+        country = db.session.query(Country).get(country_id)
+        
         try:
+            db.session.delete(country)
             db.session.commit()
             return 0
         except:
+            db.session.rollback()
             return 1
 
     def deletePin(self,pin_id):
         pin = Pin.query.get(pin_id)
-        db.session.delete(pin)
+        
         try:
+            db.session.delete(pin)
             db.session.commit()
             return 0
         except:
+            db.session.rollback()
             return 1
 
 
     def deleteDid(self,did_id):
         did = Did.query.get(did_id)
-        db.session.delete(did)
+        
         try:
+            db.session.delete(did)
             db.session.commit()
             return 0
         except:
+            db.session.rollback()
             return 1
 
 
     def deleteOwn(self,own_id):
         own = Own.query.get(own_id)
-        db.session.delete(own)
+        
         try:
+            db.session.delete(own)
             db.session.commit()
             return 0
         except:
+            db.session.rollback()
             return 1
 
     def deleteUser(self,user_id):
         user = Users.query.get(user_id)
-        db.session.delete(user)
+        
         try:
+            db.session.delete(user)
             db.session.commit()
             return 0
         except:
+            db.session.rollback()
             return 1
 
 
     def deleteIp(self,ip_id):
         ip = Ipfilters.query.get(ip_id)
-        db.session.delete(ip)
+        
         try:
+            db.session.delete(ip)
             db.session.commit()
             return 0
         except:
+            db.session.rollback()
             return 1
 
     def insertOwns(self,dataList):
@@ -518,7 +429,7 @@ class System():
             db.session.commit()
 
         
-        #db.session.close()        
+        #        
         return data_list_length
 
             
@@ -533,19 +444,19 @@ class User():
     def find(self):
 
         exist = db.session.query(Users).filter_by(email=self.email).first()
-        db.session.close()
+        
         return exist
 
     def findCountry(self,country):
         exist = db.session.query(exists().where(Country.country == country)).scalar()
-        db.session.close()
+        #
         return exist
 
     def check_destination(self,user_id,destination_phone):
 
         exist = db.session.query(Destinations).filter_by(number=destination_phone,user_id=user_id).first()
-        db.session.close()
-        #db.session.close()
+        
+        #
         return exist
 
 
@@ -566,7 +477,7 @@ class User():
                 this_did.available = 'NO'
                 db.session.add(destination)
                 db.session.commit()
-                db.session.close()
+                
                 return 0
             except:
                 return 506
@@ -578,13 +489,13 @@ class User():
     def checkDid(self, phone):
 
         exist = db.session.query(exists().where(Did.phone == phone)).scalar()
-        db.session.close()
+        
         return exist
 
     def checkSim(self, sim):
 
         exist = db.session.query(exists().where(Own.sim == sim)).scalar()
-        db.session.close()
+        
         return exist
 
     def createCustomer(self,firstname,lastname,email,number,user_type='USER',account=None):
@@ -597,7 +508,7 @@ class User():
             customer = Users(firstname,lastname,email,account,number,user_id,user_type)
             db.session.add(customer)
             db.session.commit()
-            db.session.close()
+            
             return 0
 
         return 1
@@ -616,7 +527,7 @@ class User():
 
                 db.session.add(own)
                 db.session.commit()
-                db.session.close()
+                
                 return 0
             except:
                 return 506
@@ -635,9 +546,10 @@ class User():
 
                 db.session.add(country)
                 db.session.commit()
-                db.session.close()
+                
                 return 0
             except:
+
                 return 506
         return 1
 
@@ -654,7 +566,7 @@ class User():
             did = Did(phone,user_id,provider,cost,country,capacity,mode,pin)
             db.session.add(did)
             db.session.commit()
-            db.session.close()
+            
             return 0
 
         return 1
@@ -663,7 +575,7 @@ class User():
     def verify(self, account):
 
         exist = db.session.query(Users).filter_by(email=self.email,account=account).first()
-        db.session.close()
+        
         return exist
 
     def login(self,account):
@@ -693,7 +605,7 @@ class User():
 
         try:
             db.session.commit()
-            db.session.close()
+            
         except:
             return 506 ### Data insertion error
 
@@ -710,7 +622,7 @@ class User():
             user = Users(firstname,lastname,email,account,number)
             db.session.add(user)
             db.session.commit()
-            db.session.close()
+            
             return 0
         return 1
 

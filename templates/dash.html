@@ -5,7 +5,7 @@
 		<title>{% block title %}{% endblock %}</title>
 		<link rel="stylesheet" type="text/css" href="/static/styles.css">
 		<link rel="stylesheet" type="text/css" href="/static/font-awesome.css">
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="/static/js.js"></script>
 		<script type="text/javascript">
 		$(document).ready(function(){
 
@@ -47,6 +47,10 @@
 		   						alert("You deleted "+get_val)
 		   						var row = $('#row'+id).hide()
 		   					}
+		   					else if(data.success == 1){
+
+		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
+		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)
 		   					}
@@ -75,6 +79,10 @@
 
 		   						alert("You deleted "+get_val)
 		   						var row = $('#pinrow'+id).hide()
+		   					}
+		   					else if(data.success == 1){
+
+		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
 		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)
@@ -106,6 +114,10 @@
 		   						alert("You deleted "+get_val)
 		   						var row = $('#ownrow'+id).hide()
 		   					}
+		   					else if(data.success == 1){
+
+		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
+		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)
 		   					}
@@ -134,6 +146,10 @@
 
 		   						alert("You deleted "+get_val)
 		   						var row = $('#didrow'+id).hide()
+		   					}
+		   					else if(data.success == 1){
+
+		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
 		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)
@@ -164,6 +180,10 @@
 		   						alert("You deleted "+get_val)
 		   						var row = $('#userrow'+id).hide()
 		   					}
+		   					else if(data.success == 1){
+
+		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
+		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)
 		   					}
@@ -192,6 +212,10 @@
 
 		   						alert("You deleted "+get_val)
 		   						var row = $('#iprow'+id).hide()
+		   					}
+		   					else if(data.success == 1){
+
+		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
 		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)

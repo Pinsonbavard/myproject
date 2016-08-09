@@ -22,7 +22,7 @@ from sqlalchemy.orm import relationship, backref
 from time import strftime, gmtime, localtime
 import os
 from werkzeug import secure_filename
-import iptc
+#import iptc
 from geoip import geolite2
 import requests
 from socket import gethostname, gethostbyname 
@@ -437,10 +437,12 @@ def Pin():
             if type(response) is int:
 
                 error = 'Error ' + str(response)
+                pins = system.pins()
                 return render_template('pin.html', login_user=login_user, error=error, pins=pins)
             else:
 
                 error = response
+                pins = system.pins()
                 return render_template('pin.html', login_user=login_user, error=error, pins=pins)
         return render_template('pin.html', login_user=login_user, error=error, pins=pins)
 
@@ -518,6 +520,7 @@ def countries():
             if response == 0:
                 error = country + ' added to region ' + region+', refresh browser to see update'
                 flash("Country added Successfully")
+                countries = system.countries()
                 return render_template('country.html', login_user=login_user, error=error,countries=countries)
             if response == 506:
 
@@ -560,6 +563,7 @@ def Own():
                 if response == 0:
                     flash('OWN Successfully created')
                     error = 'OWN Successfully created with did '+did
+                    owns = system.owns()
                     return render_template('own.html', login_user=login_user, error=error,owns=owns)
 
                 elif response == 1:
@@ -617,6 +621,7 @@ def Did():
         pins = system.pins()
         countries = system.countries()
         dids = system.dids()
+        
         error = None
 
         if request.method == 'POST':
@@ -635,19 +640,19 @@ def Did():
         
                 if len(phone) < 1:
 
-                    abort(400, 'The phone number is invalid')
+                    abort(400,'The phone number is invalid')
                 elif len(cost) < 1:
-                    abort(400,'Invalid cost specified')
+                   abort(400,'Invalid cost specified')
                 elif len(country) < 1:
-                    abort(400, 'Invalid country code')
+                    abort(400,'Invalid country code')
                 elif len(capacity) < 1:
-                    abort(400, 'Please select capacity')
+                    abort(400,'Please select capacity')
                 elif len(provider) < 1:
-                    abort(400, 'Please select provider')
+                    abort(400,'Please select provider')
                 elif len(mode) < 1:
-                    abort(400, 'Please select mode')
+                    abort(400,'Please select mode')
                 elif len(pin) < 1:
-                    abort(400, 'Please select pin')
+                    abort(400,'Please select pin')
 
                 email = session.get('username')
                 response = User(email).createDid(phone,provider,cost,country,capacity,mode,pin)
@@ -656,15 +661,15 @@ def Did():
 
 
                     flash('DID Successfully created')
-                    error = 'DID Successfully created with pin '+pin
+                    dids = system.dids()
+                    error = 'DID Successfully created  '+phone
                     return render_template('did.html', login_user=login_user, error=error, dids=dids, pins=pins, countries=countries)
 
                 elif response == 1:
 
-
-                    abort(400, 'DID %s already exist'%(phone))
+                    abort(400,'DID %s already exist'%(phone))
                 else:
-                    abort(400, 'DID is not created')
+                    abort(400,'DID is not created')
         
             if System().allowed_file(file.filename):
 
