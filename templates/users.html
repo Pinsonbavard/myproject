@@ -61,6 +61,11 @@
 						{{destination.channel or ''}}<br />
 					{% endfor %}
 				</td>
+				<td>
+					{% for destination in customer.destinations %}
+						<a href="/customers/destinations/delete/{{destination.id}}">del</a><br />
+					{% endfor %}
+				</td>
 				<td><input type="hidden" value="{{customer.first_name}} {{customer.last_name}}"></td>
 				<td><a id="{{customer.id}}" class="user-delete-icon">delete</a></td>
 			</tr>

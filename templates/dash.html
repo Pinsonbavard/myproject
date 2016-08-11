@@ -229,6 +229,31 @@
 
 		   })
 
+
+		   
+		    	pin_class = $('.did-pin-class')
+		   		did_mode_value = $(this).find(":selected").val()
+		   		if(did_mode_value == 'PIN-DIALING'){
+
+		   			pin_class.show()
+		   		}
+		   		else{
+		   			pin_class.hide()
+		   		}
+
+		   $('.did-mode').on('change',function(){
+
+		   		var pin_class = $('.did-pin-class')
+		   		var did_mode_value = $(this).find(":selected").val()
+		   		if(did_mode_value == 'PIN-DIALING'){
+
+		   			pin_class.show()
+		   		}
+		   		else{
+		   			pin_class.hide()
+		   		}
+		   })
+
 		});
 
 		

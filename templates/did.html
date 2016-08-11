@@ -46,16 +46,16 @@
 	</div>
 	<div>
 		<label for="auth_gw">mode</label>
-		<select id="auth_gw" name="mode">
-			<option>Select..</option>
+		<select id="auth_gw" name="mode" class="did-mode">
+			<option value="">Select..</option>
 			<option value="PIN-DIALING">PIN-DIALING</option>
 			<option value="DIRECT-DIALING">DIRECT-DIALING</option>
 		</select>
 	</div>
-	<div>
+	<div class="did-pin-class" style="display:none;">
 		<label for="auth_gw">Pins</label>
 		<select id="auth_gw" name="pin">
-			<option>Select..</option>
+			<option value="">Select..</option>
 			{% for pin in pins %}
 				<option value="{{pin.pin}}">{{pin.pin}}</option>
 			{% endfor %}

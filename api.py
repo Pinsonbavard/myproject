@@ -199,6 +199,7 @@ def Register():
             elif len(lastname) < 1:
                 error = 'The lastname cannot be empty'
             else:
+                db.session.commit() ###### commit to the database to refresh it
                 system = System()
                 account = system.account()
 
@@ -217,9 +218,10 @@ def Register():
                     login_user = system.getUser(session.get('username'))
                     return redirect(url_for('Home'))
         return render_template('register.html', error=error)
+    db.session.commit() ################ commit to the database to refresh it
     system = System()
     login_user = system.getUser(session.get('username'))
-    return render_template('home.html', login_user=login_user)
+    return redirect('/home')
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -227,6 +229,7 @@ def Login():
 
     if not 'username' in session:
 
+        db.session.commit() ####### commit to the database to refresh it
         if request.method == 'POST':
 
             error = None
@@ -245,14 +248,16 @@ def Login():
             error = 'Invalid login credentials'
             return render_template('login.html', error=error)
         return render_template('login.html')
+    db.session.commit() ####### commit to the database to refresh it
     system = System()
     login_user = system.getUser(session.get('username'))
-    return render_template('home.html', login_user=login_user)
+    return redirect('/home')
 
 @app.route('/customers')
 def users():
 
     if 'username' in session:
+        db.session.commit() ####### Make recent hit to the
         system = System()
         login_user = system.getUser(session.get('username'))
         customers = system.customers()
@@ -352,7 +357,7 @@ def user_edit(user_id=None):
 def destination_new(user_id):
 
     if 'username' in session:
-
+        db.session.commit() ####### Make a recent call to the database
         system = System()
         dids = system.available_dids()
         owns = system.owns()
@@ -363,13 +368,13 @@ def destination_new(user_id):
             return redirect('/customers')
 
         if request.method == 'POST':
-
+            
             did = request.form['did']
             own = request.form['own']
-            record = request.form['record']
-            auth_gw = request.form['auth_gw']
-            auth_did = request.form['auth_did']
             gateway = request.form['gateway']
+            
+            
+            
             channel = request.form['channel']
             number = request.form['number']
             day = request.form['day']
@@ -378,12 +383,29 @@ def destination_new(user_id):
             string_date = year + '-' + month + '-' + day + ' 12:00:00'
             end_date = datetime.datetime.strptime(string_date, "%Y-%m-%d %H:%M:%S")
             email = session.get('username')
+            if not request.form.get('auth_did'):
+                auth_did = "0"
+            else:
+                auth_did = request.form['auth_did']
+            if not request.form.get('auth_gw'):
+                auth_gw = "0"
+            else:
+                auth_gw = request.form['auth_gw']
+            if not request.form.get('record'):
+                record = "0"
+            else:
+                record = request.form['record']
+
             response = User(email).destination_new(user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date)
             if response == 0:
                 
-                error = "Destination created for origin "
+                error = "Destination " + str(number) + " created successfully"
+                
             if response == 1:
                 error = " Destination number already exist with origin " 
+            db.session.commit() ####### Make a recent call to the database
+            system = System()
+            dids = system.available_dids()
             return render_template('destination-new.html', login_user=login_user, user=user, error=error, dids=dids, owns=owns)
         return render_template('destination-new.html', login_user=login_user, user=user, error=error, dids=dids, owns=owns)
 
@@ -393,8 +415,10 @@ def destination_new(user_id):
 @app.route("/home")
 def Home():
 
+
     if 'username' in session:
 
+        db.session.commit()
         #ip = gethostbyname(gethostname()) 
         ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') 
         system = System()
@@ -416,7 +440,13 @@ def Ipfilters():
         return render_template('ipfilters.html', login_user=login_user, ip=ip, ipfilters=ipfilters)
     return redirect(url_for("Index"))
 
-
+@app.route('/checkdid/<did>', methods=['GET'])
+def checker(did):
+    db.session.commit()
+    total = System().total_dids(did)
+    this_did = System().this_did(did)
+    this_did = this_did.capacity
+    return jsonify({"total":total, "capacity":this_did})
 @app.route("/pin", methods=['POST','GET']) 
 def Pin():
 
@@ -456,6 +486,16 @@ def deleteCountry(country_id):
         system = System()
         response = system.deleteCountry(country_id)
         return jsonify({"success":response})
+
+
+@app.route("/customers/destinations/delete/<destination_id>",methods=["GET"])
+def deleteDestination(destination_id):
+    if request.method == 'GET':
+        db.session.commit() ###### Make recent call to database
+        system = System()
+        response = system.deleteDestination(destination_id)
+        return redirect('/customers')
+        
 
 
 
@@ -538,6 +578,7 @@ def Own():
 
     if 'username' in session:
 
+        db.session.commit() ###### commit to the database
         system = System()
         login_user = system.getUser(session.get('username'))
         dids = system.dids()
@@ -564,7 +605,7 @@ def Own():
                     flash('OWN Successfully created')
                     error = 'OWN Successfully created with did '+did
                     owns = system.owns()
-                    return render_template('own.html', login_user=login_user, error=error,owns=owns)
+                    return redirect('/own')
 
                 elif response == 1:
                     abort(400, 'OWN %s already exist with SIM '%(sim))
@@ -587,7 +628,7 @@ def Own():
                     data_list_owns = system.readCSV(fileUrl)
                     insert_owns = system.insertOwns(data_list_owns)
 
-                    error =  str(insert_owns) + ' OWN has been uploaded and saved'
+                    error =  error =  str(insert_owns['insertnum']) + ' Owns has been uploaded in total of '+ str(insert_owns['total'])
                     #error =  data_list_owns
 
                 except:
@@ -598,10 +639,12 @@ def Own():
             else:
 
                 error = 'File format is not allowed'
-
+            owns = system.owns()
             return render_template('own.html', login_user=login_user, error=error, own_file=file, owns=owns)
 
-
+        db.session.commit() ###### commit to the database
+        dids = system.dids()
+        owns = system.owns()
         return render_template('own.html', login_user=login_user, error=error, dids=dids, owns=owns)
 
 
@@ -615,10 +658,10 @@ def Did():
     if 'username' in session:
 
 
-
+        db.session.commit() ###### commit to the database 
         system = System()
         login_user = system.getUser(session.get('username'))
-        pins = system.pins()
+        pins = system.available_pins()
         countries = system.countries()
         dids = system.dids()
         
@@ -651,23 +694,31 @@ def Did():
                     abort(400,'Please select provider')
                 elif len(mode) < 1:
                     abort(400,'Please select mode')
-                elif len(pin) < 1:
+                elif mode == 'PIN-DIALING' and len(pin) < 1:
                     abort(400,'Please select pin')
+                elif mode == 'DIRECT-DIALING':
+                    pin = None
 
                 email = session.get('username')
                 response = User(email).createDid(phone,provider,cost,country,capacity,mode,pin)
-
+                
                 if response == 0:
 
 
                     flash('DID Successfully created')
                     dids = system.dids()
+                    pins = system.available_pins()
                     error = 'DID Successfully created  '+phone
-                    return render_template('did.html', login_user=login_user, error=error, dids=dids, pins=pins, countries=countries)
-
+                    #return render_template('did.html', login_user=login_user, error=error, dids=dids, pins=pins, countries=countries)
+                    return redirect('/did')
                 elif response == 1:
 
                     abort(400,'DID %s already exist'%(phone))
+
+                elif response == 506:
+
+                    abort(400,'A technical error occured, this has to do with the application program the mode for the pin in the (PIN) table')
+
                 else:
                     abort(400,'DID is not created')
         
@@ -686,28 +737,27 @@ def Did():
                     data_list_dids = System().readCSV(fileUrl)
                     insert_dids = System().insertDids(data_list_dids)
 
-                    error =  str(insert_dids) + ' DIDs has been uploaded and saved'
+                    error =  str(insert_dids['insertnum']) + ' DIDs has been uploaded in total of '+ str(insert_dids['total'])
 
                 except:
 
 
-                    error = 'File not uploaded Successfully'
+                    error = 'File not uploaded Successfully' 
         
             else:
 
                 error = 'File format is not allowed'
-
+            ###### After the browsers refresh when uploading from a file
+            dids = system.dids()
+            pins = system.available_pins()
             return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids,pins=pins,countries=countries)
-
+        ###### When the browser is using other method apart from GET
+        db.session.commit()
+        dids = system.dids()
+        pins = system.available_pins()
         return render_template('did.html', login_user=login_user, error=error, pins=pins, dids=dids,countries=countries)
 
     return redirect(url_for("Index"))
-
-
-
-
-    
-
 
 
 

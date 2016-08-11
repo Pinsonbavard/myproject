@@ -145,7 +145,7 @@ class Did(db.Model):
     country = db.Column(db.String(30), nullable=False)
     capacity = db.Column(db.Integer, nullable=False)
     mode = db.Column(db.String(30), nullable=False)
-    pin = db.Column(db.String(10), nullable=False)
+    pin = db.Column(db.String(10), nullable=True)
     available = db.Column(db.String(10), nullable=False, default='YES')
 
     def __init__(self,phone,user_id,provider,cost,country,capacity,mode,pin):
@@ -253,6 +253,12 @@ class System():
         dids = Did.query.filter_by(available='YES').all()
         return dids
 
+    def total_dids(self,did):
+        total = db.session.query(Destinations).filter_by(did=did).count()
+        total = total + 1
+        return total
+
+
     def this_did(self,did):
 
         did = Did.query.filter_by(phone=did).first()
@@ -272,6 +278,11 @@ class System():
     def pins(self):
 
         pins = Pin.query.all()
+        return pins
+
+    def available_pins(self):
+
+        pins = Pin.query.filter_by(mode='AVAILABLE').all()
         return pins
 
     def countries(self):
@@ -339,22 +350,39 @@ class System():
 
     def insertDids(self,dataList):
         data_list_length = len(dataList)
+        i = 0
         for data in dataList:
+            
+            ##### check if did already exist, and ignore did
+            exist = db.session.query(exists().where(Did.phone == data[0])).scalar()
+            if not exist:
+                #### INSERT INTO did table
 
-            #### INSERT INTO did table
-            did = Did(data[0],"SYSTEM",data[3],data[2],data[1],data[4],data[5],data[6])
-            db.session.add(did)
-            db.session.commit()
-
-        
-        #        
-        return data_list_length
+                did = Did(data[0],"SYSTEM",data[3],data[2],data[1],data[4],data[5],data[6])
+                db.session.add(did)
+                db.session.commit()
+                i += 1
+      
+        return {"insertnum":i, "total":data_list_length}
 
     def deleteCountry(self,country_id):
         country = db.session.query(Country).get(country_id)
         
         try:
             db.session.delete(country)
+            db.session.commit()
+            return 0
+        except:
+            db.session.rollback()
+            return 1
+
+
+    def deleteDestination(self,destination_id):
+
+        destination = db.session.query(Destinations).get(destination_id)
+        
+        try:
+            db.session.delete(destination)
             db.session.commit()
             return 0
         except:
@@ -374,7 +402,7 @@ class System():
 
 
     def deleteDid(self,did_id):
-        did = Did.query.get(did_id)
+        did = db.session.query(Did).get(did_id)
         
         try:
             db.session.delete(did)
@@ -421,16 +449,19 @@ class System():
 
     def insertOwns(self,dataList):
         data_list_length = len(dataList)
+        i = 0
         for data in dataList:
+             ##### check if own already exist, and ignore did
+            exist = db.session.query(exists().where(Own.sim == data[0])).scalar()
+            if not exist:
 
-            #### INSERT INTO did table
-            own = Own(data[0],data[1],"SYSTEM")
-            db.session.add(own)
-            db.session.commit()
-
-        
-        #        
-        return data_list_length
+                #### INSERT INTO did table
+                own = Own(data[0],data[1],"SYSTEM")
+                db.session.add(own)
+                db.session.commit()
+                i += 1
+       
+        return {"insertnum":i, "total":data_list_length}
 
             
 
@@ -442,12 +473,13 @@ class User():
         self.email = email
 
     def find(self):
-
+        #db.session.commit()
         exist = db.session.query(Users).filter_by(email=self.email).first()
         
         return exist
 
     def findCountry(self,country):
+        db.session.commit()
         exist = db.session.query(exists().where(Country.country == country)).scalar()
         #
         return exist
@@ -469,12 +501,14 @@ class User():
             user = self.find()
             created_by = user.id
 
-            destination = Destinations(user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date,created_by)
-            
-            try:
+            total_dids = System().total_dids(did) ####### Get the total number of time this did has been used
+            this_did = System().this_did(did)
 
-                this_did = System().this_did(did)
-                this_did.available = 'NO'
+            try:
+                
+                if total_dids == this_did.capacity:
+                    this_did.available = 'NO'
+                destination = Destinations(user_id,did,number,record,auth_did,auth_gw,gateway,channel,own,end_date,created_by)
                 db.session.add(destination)
                 db.session.commit()
                 
@@ -488,12 +522,12 @@ class User():
 
     def checkDid(self, phone):
 
+        db.session.commit()
         exist = db.session.query(exists().where(Did.phone == phone)).scalar()
-        
         return exist
 
     def checkSim(self, sim):
-
+        db.session.commit()
         exist = db.session.query(exists().where(Own.sim == sim)).scalar()
         
         return exist
@@ -564,10 +598,17 @@ class User():
             user = self.find()
             user_id = user.id
             did = Did(phone,user_id,provider,cost,country,capacity,mode,pin)
-            db.session.add(did)
-            db.session.commit()
-            
-            return 0
+            try:
+
+                db.session.add(did)
+                # update pin in the pin table to say "NOT-AVAILABLE"
+                if mode == 'PIN-DIALING':
+                    used_pin = Pin.query.filter_by(pin=pin).first()
+                    used_pin.mode = 'NOT-AVAILABLE'
+                db.session.commit()
+                return 0
+            except:
+                return 506
 
         return 1
 
