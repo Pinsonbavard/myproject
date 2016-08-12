@@ -488,12 +488,12 @@ def deleteCountry(country_id):
         return jsonify({"success":response})
 
 
-@app.route("/customers/destinations/delete/<destination_id>",methods=["GET"])
-def deleteDestination(destination_id):
+@app.route("/customers/destinations/delete/<did>/<destination_id>",methods=["GET"])
+def deleteDestination(did,destination_id):
     if request.method == 'GET':
         db.session.commit() ###### Make recent call to database
         system = System()
-        response = system.deleteDestination(destination_id)
+        response = system.deleteDestination(did,destination_id)
         return redirect('/customers')
         
 
@@ -507,11 +507,11 @@ def deletePin(pin_id):
         return jsonify({"success":response})
 
 
-@app.route("/dids/delete/<did_id>",methods=["GET"])
-def deleteDid(did_id):
+@app.route("/dids/delete/<did_id>/<did>",methods=["GET"])
+def deleteDid(did_id,did):
     if request.method == 'GET':
         system = System()
-        response = system.deleteDid(did_id)
+        response = system.deleteDid(did_id,did)
         return jsonify({"success":response})
 
 @app.route("/owns/delete/<own_id>",methods=["GET"])
@@ -664,6 +664,7 @@ def Did():
         pins = system.available_pins()
         countries = system.countries()
         dids = system.dids()
+        count_available_dids = system.count_available_dids()
         
         error = None
 
@@ -750,12 +751,14 @@ def Did():
             ###### After the browsers refresh when uploading from a file
             dids = system.dids()
             pins = system.available_pins()
-            return render_template('did.html', login_user=login_user, error=error, did_file=file, dids=dids,pins=pins,countries=countries)
+            count_available_dids = system.count_available_dids()
+            return render_template('did.html', login_user=login_user, countdids=count_available_dids, error=error, did_file=file, dids=dids,pins=pins,countries=countries)
         ###### When the browser is using other method apart from GET
         db.session.commit()
         dids = system.dids()
         pins = system.available_pins()
-        return render_template('did.html', login_user=login_user, error=error, pins=pins, dids=dids,countries=countries)
+        count_available_dids = system.count_available_dids()
+        return render_template('did.html', login_user=login_user, countdids=count_available_dids, error=error, pins=pins, dids=dids,countries=countries)
 
     return redirect(url_for("Index"))
 
@@ -786,8 +789,8 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    #app.run(debug=True,port=90)
+    app.run(debug=True,port=90)
     #app.run()
     #system = System()
     #system.defaultAction()
-    app.run(host='0.0.0.0')
+    #app.run(host='0.0.0.0')

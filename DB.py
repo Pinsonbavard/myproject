@@ -253,9 +253,19 @@ class System():
         dids = Did.query.filter_by(available='YES').all()
         return dids
 
+    def count_available_dids(self):
+
+        dids = Did.query.filter_by(available='YES').count()
+        return dids
+
     def total_dids(self,did):
         total = db.session.query(Destinations).filter_by(did=did).count()
         total = total + 1
+        return total
+
+
+    def didsCount(self,did):
+        total = db.session.query(Destinations).filter_by(did=did).count()
         return total
 
 
@@ -377,12 +387,13 @@ class System():
             return 1
 
 
-    def deleteDestination(self,destination_id):
+    def deleteDestination(self,did,destination_id):
 
         destination = db.session.query(Destinations).get(destination_id)
-        
+        this_did = System().this_did(did)
         try:
             db.session.delete(destination)
+            this_did.available = 'YES'
             db.session.commit()
             return 0
         except:
@@ -401,13 +412,18 @@ class System():
             return 1
 
 
-    def deleteDid(self,did_id):
+    def deleteDid(self,did_id,act_did):
         did = db.session.query(Did).get(did_id)
+        didsCount = System().didsCount(act_did)
+
         
         try:
-            db.session.delete(did)
-            db.session.commit()
-            return 0
+            if didsCount <= 0:
+
+                db.session.delete(did)
+                db.session.commit()
+                return 0
+            return 2
         except:
             db.session.rollback()
             return 1

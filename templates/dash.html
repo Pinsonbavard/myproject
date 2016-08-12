@@ -139,7 +139,7 @@
 		   		if(choice == true){
 
 		   			$.ajax({
-		   				url:'/dids/delete/'+id,
+		   				url:'/dids/delete/'+id+'/'+get_val,
 		   				dataType: 'json',
 		   				success: function(data){
 		   					if(data.success == 0){
@@ -150,6 +150,10 @@
 		   					else if(data.success == 1){
 
 		   						alert("Record not deleted, so it is rolled back, please execute your action again ")
+		   					}
+		   					else if(data.success == 2){
+
+		   						alert("DID is not deleted because it is tied to a destination")
 		   					}
 		   					else{
 		   						alert("You didnt delete "+get_val)
@@ -230,7 +234,7 @@
 		   })
 
 
-		   
+
 		    	pin_class = $('.did-pin-class')
 		   		did_mode_value = $(this).find(":selected").val()
 		   		if(did_mode_value == 'PIN-DIALING'){
