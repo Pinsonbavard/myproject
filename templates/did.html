@@ -94,6 +94,7 @@
 		<th>Created by</th>
 		<th>Created date</th>
 		<th>Used for</th>
+		<th>Filled</th>
 		<th>Available</th>
 	</tr>
 	{% for did in dids%}
@@ -107,6 +108,7 @@
 		<td>{{did.created_by | User }}</td>
 		<td>{{did.created_date | humandatetime | safe}}</td>
 		<td>{{did.phone | DestinationUserId | User | safe}}</td>
+		<td>{{did.phone | FreeDidsCount | safe}}</td>
 		<td>{{did.available}}</td>
 		<td><input type="hidden" value="{{did.phone}}"></td>
 		<td><a id="{{did.id}}" class="did-delete-icon">delete</a></td>

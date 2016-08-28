@@ -22,7 +22,8 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config["SQLALCHEMY_POOL_RECYCLE"] = 30
+app.config['SQLALCHEMY_POOL_SIZE'] = 100
+app.config["SQLALCHEMY_POOL_RECYCLE"] = 280
 
 app.config['ALLOWED_EXTENSIONS'] = set(['csv'])
 
@@ -75,7 +76,7 @@ class Destinations(db.Model):
     gateway = db.Column(db.Text, nullable=False)
     channel = db.Column(db.Text, nullable=False)
     own = db.Column(db.Text, nullable=False)
-    number = db.Column(db.Unicode(50), nullable=False)
+    number = db.Column(db.Unicode(50), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_by = db.Column(db.Integer,nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now())
@@ -129,7 +130,8 @@ class Calls(db.Model):
     duration = db.Column(db.Integer, nullable=False)
     has_recording = db.Column(db.Integer, nullable=False)
     source = db.Column(db.Text, nullable=False)
-    destination  = db.Column(db.Text, nullable=False) 
+    destination  = db.Column(db.Text, nullable=False)
+    created_by = db.Column(db.Integer, nullable=False)
 
 
 class Did(db.Model):
@@ -221,8 +223,9 @@ class System():
 
     
     def getUser(self,email):
-
+        
         user = db.session.query(Users).filter_by(email=email).first()
+        
         return user
 
 

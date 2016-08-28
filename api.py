@@ -30,7 +30,7 @@ from socket import gethostname, gethostbyname
 
     
 
-e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", isolation_level="READ UNCOMMITTED", pool_recycle=280)
+#e = create_engine("mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062", pool_recycle=29)
 
 #e = create_engine("mysql://firsvat:Firsvat@2016@98.102.204.204:3306/firsvat", pool_recycle=3600)
 
@@ -43,8 +43,8 @@ def ensure_dir(d):
 
         os.makedirs(d)
 
-app.config['SQLALCHEMY_POOL_SIZE'] = 100
-app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
+#app.config['SQLALCHEMY_POOL_SIZE'] = 100
+#app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config["MAIL_SERVER"] = "smtp.pepipost.com"
 app.config["MAIL_PORT"] = 25
@@ -76,6 +76,14 @@ def _jinja2_filter_user(id):
     if user is None:
         return "SYSTEM"
     return user.first_name + ' '+ user.last_name
+
+
+@app.template_filter('FreeDidsCount')
+def _jinja2_filter_user(did):
+
+    system = System()
+    count = system.didsCount(did)
+    return count
 
 
 @app.template_filter('IpCountryCode')
@@ -215,10 +223,11 @@ def Register():
                     thr = Thread(target=send_async_email_test, args=[app, msg])
                     thr.start()
                     flash("Logged In")
+                    db.session.commit() ####### commit to the database to refresh it
                     login_user = system.getUser(session.get('username'))
                     return redirect(url_for('Home'))
         return render_template('register.html', error=error)
-    db.session.commit() ################ commit to the database to refresh it
+    db.session.rollback() ################ commit to the database to refresh it
     system = System()
     login_user = system.getUser(session.get('username'))
     return redirect('/home')
@@ -229,7 +238,7 @@ def Login():
 
     if not 'username' in session:
 
-        db.session.commit() ####### commit to the database to refresh it
+        #db.session.commit() ####### commit to the database to refresh it
         if request.method == 'POST':
 
             error = None
@@ -243,6 +252,7 @@ def Login():
             if response == 1:
                 flash("Logged In")
                 session['username'] = email
+                db.session.commit() ####### commit to the database to refresh it
                 login_user = System().getUser(session.get('username'))
                 return redirect('/home')
             error = 'Invalid login credentials'
@@ -372,9 +382,6 @@ def destination_new(user_id):
             did = request.form['did']
             own = request.form['own']
             gateway = request.form['gateway']
-            
-            
-            
             channel = request.form['channel']
             number = request.form['number']
             day = request.form['day']
@@ -509,7 +516,9 @@ def deletePin(pin_id):
 
 @app.route("/dids/delete/<did_id>/<did>",methods=["GET"])
 def deleteDid(did_id,did):
+
     if request.method == 'GET':
+        db.session.commit()
         system = System()
         response = system.deleteDid(did_id,did)
         return jsonify({"success":response})
@@ -754,7 +763,7 @@ def Did():
             count_available_dids = system.count_available_dids()
             return render_template('did.html', login_user=login_user, countdids=count_available_dids, error=error, did_file=file, dids=dids,pins=pins,countries=countries)
         ###### When the browser is using other method apart from GET
-        db.session.commit()
+        db.session.rollback()
         dids = system.dids()
         pins = system.available_pins()
         count_available_dids = system.count_available_dids()
@@ -789,8 +798,8 @@ if __name__ == "__main__":
     
     ##db.session.rollback() 
     #db.session.commit()
-    app.run(debug=True,port=90)
+    #app.run(debug=True,port=90)
     #app.run()
     #system = System()
     #system.defaultAction()
-    #app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0')
