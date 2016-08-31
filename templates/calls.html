@@ -1,5 +1,6 @@
-{% extends "base.html" %}
+{% extends "dash.html" %}
 {% block title %}Calls - Switch{% endblock %}
+{% block user %}{{login_user['first_name']}} [{{login_user['account']}}]{% endblock %}
 {% block content %}
 <h1>Calls</h1>
 <table>
@@ -7,6 +8,7 @@
 		<tr>
 			<th>Date</th>
 			<th>Source</th>
+			<th>Origin</th>
 			<th>Destination</th>
 			<th>Status</th>
 			<th>Duration</th>
@@ -16,8 +18,9 @@
 	<tbody>
 		{% for call in calls %}
 			<tr>
-				<td>{{call.date|humandate}} {{call.date|humantime}}</td>
+				<td>{{call.created_date|humandate}} {{call.created_date|humantime}}</td>
 				<td>{{call.source}}</td>
+				<td>{{call.created_by | GetOriginNumber}}</td>
 				<td>{{call.destination}}</td>
 				<td>{{call.status or ''}}</td>
 				<td>{% if call.duration %}{{call.duration|pretty_duration}}{% endif %}</td>

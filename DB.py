@@ -221,12 +221,21 @@ class System():
         ipfilterslist = db.session.query(Ipfilters).all()
         return ipfilterslist
 
+    def calls(self):
+
+        calls = db.session.query(Calls).all()
+        return calls
+
     
     def getUser(self,email):
         
-        user = db.session.query(Users).filter_by(email=email).first()
+        try:
+            user = db.session.query(Users).filter_by(email=email).first()
+            return user
+        except:
+            db.session.rollback()
         
-        return user
+        
 
 
     def getUserById(self,id):
@@ -634,16 +643,25 @@ class User():
 
     def verify(self, account):
 
-        exist = db.session.query(Users).filter_by(email=self.email,account=account).first()
+        try:
+
+            exist = db.session.query(Users).filter_by(email=self.email,account=account).first()
+            return exist
+        except:
+            db.session.rollback()
+            return 2
         
-        return exist
+        
 
     def login(self,account):
 
-        if not self.verify(account):
-
+        response = self.verify(account)
+        if response == 2:
+            return 2
+        elif response and response != 2:
+            return 1
+        else:
             return 0
-        return 1
 
     def createPins(self):
 

@@ -68,6 +68,29 @@ manager.create_api(Calls)
 
 manager.create_api(Destinations)
 
+
+@app.template_filter('pretty_duration')
+def _jinja2_filter_pretty_duration(seconds):
+    
+    minutes, seconds = divmod(seconds, 60)
+    return "%02d:%02d" % (minutes, seconds)
+
+
+@app.template_filter('humandatetime')
+def _jinja2_filter_humandatetime(date):
+    date = date.replace(tzinfo=None)
+    return date.strftime('%a&nbsp;%d&nbsp;%b&nbsp;%Y&nbsp;%H:%M')#.replace(' ', '&nbsp;')
+
+@app.template_filter('humandate')
+def _jinja2_filter_humandate(date):
+    date = date.replace(tzinfo=None)
+    return date.strftime('%a %d %b %Y')#.replace(' ', '&nbsp;')
+
+@app.template_filter('humantime')
+def _jinja2_filter_humantime(date):
+    date = date.replace(tzinfo=None)
+    return date.strftime('%H:%M')
+
 @app.template_filter('User')
 def _jinja2_filter_user(id):
 
@@ -84,6 +107,15 @@ def _jinja2_filter_user(did):
     system = System()
     count = system.didsCount(did)
     return count
+
+
+@app.template_filter('GetOriginNumber')
+def _jinja2_filter_user(id):
+
+    system = System()
+    user = system.getUserById(id)
+    origin = user.number
+    return origin
 
 
 @app.template_filter('IpCountryCode')
@@ -239,6 +271,7 @@ def Login():
     if not 'username' in session:
 
         #db.session.commit() ####### commit to the database to refresh it
+        
         if request.method == 'POST':
 
             error = None
@@ -250,17 +283,25 @@ def Login():
                 abort(400,'No account number specified')
             response = User(email).login(account)
             if response == 1:
-                flash("Logged In")
                 session['username'] = email
-                db.session.commit() ####### commit to the database to refresh it
-                login_user = System().getUser(session.get('username'))
+                system = System()
+                username = session.get('username')
+                login_user = system.getUser(username)
+                session.permanent = True
+                db.session.commit() ####### commit to the database to refresh it 
                 return redirect('/home')
-            error = 'Invalid login credentials'
+            elif response == 2:
+                error = 'Database server is sleeping... Please try again to wake it up'
+            elif response == 0:
+                error = 'Invalid login credentials'
+            else:
+                abort(400,'Something unusual happened, please check Internet connectivity')
             return render_template('login.html', error=error)
         return render_template('login.html')
     db.session.commit() ####### commit to the database to refresh it
     system = System()
-    login_user = system.getUser(session.get('username'))
+    username = session.get('username')
+    login_user = system.getUser(username)
     return redirect('/home')
 
 @app.route('/customers')
@@ -445,6 +486,18 @@ def Ipfilters():
         ipfilters = system.ipfilters()
         login_user = system.getUser(session.get('username'))
         return render_template('ipfilters.html', login_user=login_user, ip=ip, ipfilters=ipfilters)
+    return redirect(url_for("Index"))
+
+
+@app.route("/calls")
+def Calls():
+
+    if 'username' in session:
+
+        system = System()
+        calls = system.calls()
+        login_user = system.getUser(session.get('username'))
+        return render_template('calls.html', login_user=login_user, calls=calls)
     return redirect(url_for("Index"))
 
 @app.route('/checkdid/<did>', methods=['GET'])
@@ -777,7 +830,8 @@ def Did():
 def Logout():
 
     ## REMOVE THE username SESSION
-    session.pop('username',None)
+    #session.pop('username',None)
+    session.clear()
     return redirect(url_for('Index'))
 
 
