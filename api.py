@@ -284,11 +284,12 @@ def Login():
             response = User(email).login(account)
             if response == 1:
                 session['username'] = email
+                db.session.commit() ####### commit to the database to refresh it 
                 system = System()
                 username = session.get('username')
                 login_user = system.getUser(username)
                 session.permanent = True
-                db.session.commit() ####### commit to the database to refresh it 
+                
                 return redirect('/home')
             elif response == 2:
                 error = 'Database server is sleeping... Please try again to wake it up'
@@ -494,6 +495,7 @@ def Calls():
 
     if 'username' in session:
 
+        db.session.commit()
         system = System()
         calls = system.calls()
         login_user = system.getUser(session.get('username'))

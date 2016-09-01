@@ -10,9 +10,7 @@
 			<th>Source</th>
 			<th>Origin</th>
 			<th>Destination</th>
-			<th>Status</th>
-			<th>Duration</th>
-			<th>Recording</th>
+			<th>Use for</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -22,14 +20,8 @@
 				<td>{{call.source}}</td>
 				<td>{{call.created_by | GetOriginNumber}}</td>
 				<td>{{call.destination}}</td>
-				<td>{{call.status or ''}}</td>
-				<td>{% if call.duration %}{{call.duration|pretty_duration}}{% endif %}</td>
-				<td>
-					{% if call.has_recording %}
-						<a href="/monitor/{{call.id}}.mp3">mp3</a>
-						<a href="/delete-recording?id={{call.id}}&url=/customers/{{call.user_id}}/calls/{{call.date.year}}/{{call.date.month}}">delete</a>
-					{% endif %}
-				</td>
+				<td>{{call.created_by | User | safe}}</td>
+				
 			</tr>
 		{% endfor %}
 	</tbody>

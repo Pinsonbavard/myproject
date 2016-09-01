@@ -11,7 +11,7 @@ Created on Sat Jul 16 01:04:58 2016
 from flask import Flask, jsonify,make_response, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 import datetime, os
 import psutil
 from sqlalchemy import create_engine
@@ -22,8 +22,8 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://sql8128062:xW9TErGiJF@sql8.freemysqlhosting.net/sql8128062"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_POOL_SIZE'] = 100
-app.config["SQLALCHEMY_POOL_RECYCLE"] = 280
+#app.config['SQLALCHEMY_POOL_SIZE'] = 100
+app.config["SQLALCHEMY_POOL_RECYCLE"] = 7200
 
 app.config['ALLOWED_EXTENSIONS'] = set(['csv'])
 
