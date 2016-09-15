@@ -1,0 +1,85 @@
+def handle_event(event, manager):
+    #return event
+    with ctx:
+
+        if event.name == 'Newexten':
+
+
+            user_id = event.message['accountcode']
+            data = {
+                    'user_id': user_id,
+                    'caller_id': event.message['calleridnum'],
+                    'channel': event.message['Channel'],
+                    'duration': event.message['application'],
+                    'context': event.message['context'],
+                    'extension': event.message['extension'],
+                    'line': event.message['connectedlinenum'],
+                    #'channel_state': event.message['ChannelState'],
+                    'channel_state': event.message['channelstatedesc'],
+                    }
+            user = System().getUserById(user_id)
+            if user:
+                profile = {
+                            'first_name': user['first_name'],
+                            'last_name': user['last_name']
+                        }
+               
+            else:
+                profile = {
+                            'first_name': "No firstname",
+                            'last_name': "No lastname"
+                        }
+            data.update(profile)   
+            g.channels.append(data)
+        if event.name == 'CoreShowChannelsComplete':
+            
+            g.complete = True
+
+        if not event.name:
+            data = {
+                "connectivity":"Not connected",
+                "event-name":"No event name"
+            }
+            g.channels.append(data)
+            g.complete = True
+
+    
+
+
+@app.route('/live-calls')
+def live_calls():
+
+    try:
+
+        g.complete = False
+        g.channels = []
+        manager = asterisk.manager.Manager()
+        manager.connect('hostnameaddress')
+        manager.login('username', 'password')
+        manager.register_event('*', handle_event)
+        res = manager.send_action({'Action':'Newexten'})
+        
+        #manager.logoff()
+        try:
+
+            while not g.complete:
+
+                time.sleep(0.1)
+           # print g.complete
+            manager.close()
+            return json.dumps(g.channels)
+            
+        except:
+
+            return json.dumps({"response":"Successfully connected but no channels is returned."})
+    except asterisk.manager.ManagerSocketException, (errno, reason):
+
+        return "Error connecting to the manager: %s" % reason
+        #sys.exit(1)
+    except asterisk.manager.ManagerAuthException, reason:
+
+        return "Error logging in to the manager: %s" % reason
+        #sys.exit(1)
+    except asterisk.manager.ManagerException, reason:
+        return "Error: %s" % reason
+        #sys.exit(1)
